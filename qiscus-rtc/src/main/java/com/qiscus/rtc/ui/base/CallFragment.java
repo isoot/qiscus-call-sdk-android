@@ -106,6 +106,7 @@ public abstract class CallFragment extends Fragment {
         if (callData.getCallType() == QiscusRTC.CallType.VOICE) {
             speakerOn = false;
         }
+        onCallListener.onSpeakerToggle(speakerOn);
 
         tvCallerName.setText(callData.getCalleeDisplayName());
         if (callData.getCallAs() == QiscusRTC.CallAs.CALLER) {
