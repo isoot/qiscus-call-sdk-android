@@ -43,7 +43,7 @@ public abstract class CallFragment extends Fragment {
     private View background;
     private RoundedImageView calleeAvatar;
     private Chronometer callDuration;
-    private boolean speakerOn;
+    private boolean speakerOn = true;
     private boolean micOn = true;
     private boolean isPanelHidden;
     private long callDurationMillis;
@@ -70,7 +70,6 @@ public abstract class CallFragment extends Fragment {
 
     private void parseArgumentData() {
         callData = getArguments().getParcelable(CALL_DATA);
-        speakerOn = callData.getCallType() == QiscusRTC.CallType.VIDEO;
     }
 
     @Nullable
