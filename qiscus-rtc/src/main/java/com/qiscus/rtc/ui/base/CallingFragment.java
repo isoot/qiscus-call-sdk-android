@@ -112,6 +112,7 @@ public abstract class CallingFragment extends Fragment {
                 }
                 onCallingListener.onCallingAccepted();
                 ringManager.stop();
+                btnAcceptCall.setVisibility(View.GONE);
             }
         });
 
