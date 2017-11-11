@@ -18,8 +18,6 @@ import com.qiscus.rtc.QiscusRTC;
 import com.qiscus.rtc.R;
 import com.qiscus.rtc.data.model.QiscusRTCCall;
 import com.qiscus.rtc.engine.QiscusRTCClient;
-import com.qiscus.rtc.engine.QiscusRTCRendererCommon;
-import com.qiscus.rtc.engine.QiscusRTCViewLayout;
 import com.qiscus.rtc.engine.QiscusRTCViewRenderer;
 import com.qiscus.rtc.engine.hub.HubListener;
 import com.qiscus.rtc.engine.util.QiscusRTCListener;
@@ -29,7 +27,7 @@ import com.qiscus.rtc.ui.base.CallingFragment;
 import com.qiscus.rtc.util.RingManager;
 
 import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
+import org.webrtc.SurfaceViewRenderer;
 
 import static com.qiscus.rtc.data.config.Constants.CALL_DATA;
 import static com.qiscus.rtc.data.config.Constants.ON_GOING_NOTIF_ID;
@@ -49,19 +47,14 @@ public class QiscusCallActivity extends BaseActivity implements CallingFragment.
     };
 
     private QiscusRTCClient rtcClient;
-    private QiscusRTCViewRenderer pipRenderer;
-    private QiscusRTCViewRenderer fullscreenRenderer;
+    private SurfaceViewRenderer pipRenderer;
+    private SurfaceViewRenderer fullscreenRenderer;
     private QiscusRTC.CallEventData callEventData;
     private QiscusRTCCall callData;
-
-    private boolean isCallDelivered;
-    private boolean isCallAccepted;
 
     private FrameLayout callFragmentContainer;
     private CallingFragment callingFragment;
     private CallFragment callFragment;
-    private String displayName;
-    private String avatarUrl;
     private PowerManager powerManager;
     private PowerManager.WakeLock wakeLock;
     private int field = 0x00000020;
@@ -77,7 +70,6 @@ public class QiscusCallActivity extends BaseActivity implements CallingFragment.
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         parseIntentData();
-        EventBus.getDefault().register(this);
         initView();
         requestPermission(permissions);
         setAlwaysOn();
@@ -212,11 +204,10 @@ public class QiscusCallActivity extends BaseActivity implements CallingFragment.
     }
 
     private void initView() {
-        pipRenderer = (QiscusRTCViewRenderer) findViewById(R.id.local_video_view);
-        fullscreenRenderer = (QiscusRTCViewRenderer) findViewById(R.id.remote_video_view);
+        pipRenderer = (SurfaceViewRenderer) findViewById(R.id.local_video_view);
+        fullscreenRenderer = (SurfaceViewRenderer) findViewById(R.id.remote_video_view);
         rtcClient = new QiscusRTCClient(QiscusCallActivity.this, pipRenderer, fullscreenRenderer, this, this);
         callFragmentContainer = (FrameLayout) findViewById(R.id.call_fragment_container);
-
         pipRenderer.setVisibility(callData.getCallType() == QiscusRTC.CallType.VOICE ? View.GONE : View.VISIBLE);
         fullscreenRenderer.setVisibility(callData.getCallType() == QiscusRTC.CallType.VOICE ? View.GONE : View.VISIBLE);
 
@@ -230,8 +221,9 @@ public class QiscusCallActivity extends BaseActivity implements CallingFragment.
         });
     }
 
+    // Calling Fragment Listener
     @Override
-    public void onCallingAccepted() {
+    public void onAcceptPressed() {
         rtcClient.acceptCall();
         runOnUiThread(new Runnable() {
             @Override
@@ -242,21 +234,23 @@ public class QiscusCallActivity extends BaseActivity implements CallingFragment.
     }
 
     @Override
-    public void onCallingRejected() {
+    public void onRejectPressed() {
         rtcClient.rejectCall();
         finish();
     }
 
     @Override
-    public void onCallingCanceled() {
+    public void onCancelPressed() {
         disconnect();
     }
 
+    // Call Fragment Listener
     @Override
     public void onSpeakerToggle(boolean speakerOn) {
         if (QiscusRTC.Call.getCallConfig().getOnSpeakerClickListener() != null) {
             QiscusRTC.Call.getCallConfig().getOnSpeakerClickListener().onClick(speakerOn);
         }
+
         RingManager.getInstance(this).setSpeakerPhoneOn(speakerOn);
     }
 
@@ -265,6 +259,7 @@ public class QiscusCallActivity extends BaseActivity implements CallingFragment.
         if (QiscusRTC.Call.getCallConfig().getOnMicClickListener() != null) {
             QiscusRTC.Call.getCallConfig().getOnMicClickListener().onClick(micOn);
         }
+
         rtcClient.setAudioEnabled(micOn);
     }
 
@@ -273,6 +268,7 @@ public class QiscusCallActivity extends BaseActivity implements CallingFragment.
         if (QiscusRTC.Call.getCallConfig().getOnVideoClickListener() != null) {
             QiscusRTC.Call.getCallConfig().getOnVideoClickListener().onClick(videoOn);
         }
+
         rtcClient.setVideoEnabled(videoOn);
     }
 
@@ -281,6 +277,7 @@ public class QiscusCallActivity extends BaseActivity implements CallingFragment.
         if (QiscusRTC.Call.getCallConfig().getOnCameraClickListener() != null) {
             QiscusRTC.Call.getCallConfig().getOnCameraClickListener().onClick(frontCamera);
         }
+
         rtcClient.switchCamera();
     }
 
@@ -289,10 +286,14 @@ public class QiscusCallActivity extends BaseActivity implements CallingFragment.
         if (QiscusRTC.Call.getCallConfig().getOnEndCallClickListener() != null) {
             QiscusRTC.Call.getCallConfig().getOnEndCallClickListener().onClick(callData, calldurationMillis);
         }
+
+        callEventData.setCallEvent(QiscusRTC.CallEvent.END);
+        EventBus.getDefault().post(callEventData);
         rtcClient.endCall();
         disconnect();
     }
 
+    // Calling Listener
     @Override
     public void onPNReceived() {
         runOnUiThread(new Runnable() {
@@ -304,7 +305,7 @@ public class QiscusCallActivity extends BaseActivity implements CallingFragment.
     }
 
     @Override
-    public void onCallAccepted() {
+    public void onCallingAccepted() {
         QiscusRTC.Call.getInstance().setCallAccepted(true);
         runOnUiThread(new Runnable() {
             @Override
@@ -315,20 +316,14 @@ public class QiscusCallActivity extends BaseActivity implements CallingFragment.
     }
 
     @Override
-    public void onCallRejected() {
+    public void onCallingRejected() {
         callEventData.setCallEvent(QiscusRTC.CallEvent.REJECT);
         EventBus.getDefault().post(callEventData);
     }
 
     @Override
-    public void onCallCanceled() {
+    public void onCallingCanceled() {
         callEventData.setCallEvent(QiscusRTC.CallEvent.CANCEL);
-        EventBus.getDefault().post(callEventData);
-    }
-
-    @Override
-    public void onCallEnded() {
-        callEventData.setCallEvent(QiscusRTC.CallEvent.END);
         EventBus.getDefault().post(callEventData);
     }
 
@@ -359,41 +354,6 @@ public class QiscusCallActivity extends BaseActivity implements CallingFragment.
     @Override
     public void onPeerError() {
         //
-    }
-
-    @Subscribe
-    public void onEndCallReaseonEvent(QiscusRTC.CallEventData callEventData) {
-        if (callEventData.getCallEvent() == QiscusRTC.CallEvent.END
-                || callEventData.getCallEvent() == QiscusRTC.CallEvent.CANCEL
-                || callEventData.getCallEvent() == QiscusRTC.CallEvent.REJECT) {
-            disconnect();
-        } else if (callEventData.getCallEvent() == QiscusRTC.CallEvent.PN_RECEIVED) {
-            displayName = callEventData.getCalleeDisplayName();
-            avatarUrl = callEventData.getAvatarUrl();
-            callData.setCalleeDisplayName(displayName);
-            callData.setCalleeAvatar(avatarUrl);
-
-            RingManager.getInstance(this).playRinging(callData.getCallType());
-            isCallDelivered = true;
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    callingFragment.setCalleeAvatarAndDisplayName(displayName, avatarUrl);
-                }
-            });
-        } else if (callEventData.getCallEvent() == QiscusRTC.CallEvent.INCOMING) {
-            displayName = callEventData.getCalleeDisplayName();
-            avatarUrl = callEventData.getAvatarUrl();
-            callData.setCalleeDisplayName(displayName);
-            callData.setCalleeAvatar(avatarUrl);
-
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    callingFragment.setCalleeAvatarAndDisplayName(displayName, avatarUrl);
-                }
-            });
-        }
     }
 
     private void disconnect() {
