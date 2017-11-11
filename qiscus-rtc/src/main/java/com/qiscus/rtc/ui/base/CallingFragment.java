@@ -110,7 +110,7 @@ public abstract class CallingFragment extends Fragment {
                 if (QiscusRTC.Call.getCallConfig().getOnAcceptCallClickListener() != null) {
                     QiscusRTC.Call.getCallConfig().getOnAcceptCallClickListener().onClick(callData);
                 }
-                onCallingListener.onCallingAccepted();
+                onCallingListener.onAcceptPressed();
                 ringManager.stop();
                 btnAcceptCall.setVisibility(View.GONE);
             }
@@ -123,12 +123,12 @@ public abstract class CallingFragment extends Fragment {
                     if (QiscusRTC.Call.getCallConfig().getOnCancelCallClickListener() != null) {
                         QiscusRTC.Call.getCallConfig().getOnCancelCallClickListener().onClick(callData);
                     }
-                    onCallingListener.onCallingCanceled();
+                    onCallingListener.onCancelPressed();
                 } else {
                     if (QiscusRTC.Call.getCallConfig().getOnRejectCallClickListener() != null) {
                         QiscusRTC.Call.getCallConfig().getOnRejectCallClickListener().onClick(callData);
                     }
-                    onCallingListener.onCallingRejected();
+                    onCallingListener.onRejectPressed();
                 }
                 ringManager.stop();
             }
@@ -167,11 +167,9 @@ public abstract class CallingFragment extends Fragment {
     }
 
     public interface OnCallingListener {
-        void onCallingAccepted();
-
-        void onCallingRejected();
-
-        void onCallingCanceled();
+        void onAcceptPressed();
+        void onRejectPressed();
+        void onCancelPressed();
     }
 
     protected abstract int getLayout();

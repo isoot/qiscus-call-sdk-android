@@ -237,13 +237,9 @@ public abstract class CallFragment extends Fragment {
 
     public interface OnCallListener {
         void onSpeakerToggle(boolean speakerOn);
-
         void onMicToggle(boolean micOn);
-
         void onVideoToggle(boolean videoOn);
-
         void onCameraSwitch(boolean frontCamera);
-
         void onEndCall(long callDurationMillis);
     }
 }
