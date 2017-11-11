@@ -19,6 +19,7 @@ import org.webrtc.IceCandidate;
 import org.webrtc.RendererCommon;
 import org.webrtc.SessionDescription;
 import org.webrtc.StatsReport;
+import org.webrtc.SurfaceViewRenderer;
 import org.webrtc.VideoCapturer;
 import org.webrtc.VideoRenderer;
 
@@ -58,8 +59,8 @@ public class QiscusRTCClient implements HubSignal.SignalEvents, PCClient.PeerCon
     private PCFactory pcFactory;
     private PCClient pcClient;
     private EglBase rootEglBase;
-    private QiscusRTCViewRenderer pipRenderer;
-    private QiscusRTCViewRenderer fullscreenRenderer;
+    private SurfaceViewRenderer pipRenderer;
+    private SurfaceViewRenderer fullscreenRenderer;
     private HubSignal hubSignal;
     private HubListener hubListener;
     private QiscusRTCListener rtcListener;
@@ -69,7 +70,7 @@ public class QiscusRTCClient implements HubSignal.SignalEvents, PCClient.PeerCon
     private String clientId;
     private String roomId;
 
-    public QiscusRTCClient(Context context, QiscusRTCViewRenderer pipRenderer, QiscusRTCViewRenderer fullscreenRenderer, HubListener hubListener, QiscusRTCListener rtcListener) {
+    public QiscusRTCClient(Context context, SurfaceViewRenderer pipRenderer, SurfaceViewRenderer fullscreenRenderer, HubListener hubListener, QiscusRTCListener rtcListener) {
         this.context = context;
         this.pipRenderer = pipRenderer;
         this.fullscreenRenderer = fullscreenRenderer;
@@ -78,6 +79,7 @@ public class QiscusRTCClient implements HubSignal.SignalEvents, PCClient.PeerCon
 
         pcFactory = new PCFactory(context);
         rootEglBase = EglBase.create();
+        remoteRenderers.add(remoteProxyRenderer);
 
         this.pipRenderer.init(rootEglBase.getEglBaseContext(), null);
         this.pipRenderer.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT);
@@ -239,18 +241,18 @@ public class QiscusRTCClient implements HubSignal.SignalEvents, PCClient.PeerCon
 
     @Override
     public void onCallAccepted() {
-        hubListener.onCallAccepted();
+        hubListener.onCallingAccepted();
         pcClient.createOffer();
     }
 
     @Override
     public void onCallRejected() {
-        hubListener.onCallRejected();
+        hubListener.onCallingRejected();
     }
 
     @Override
     public void onCallCanceled() {
-        hubListener.onCallCanceled();
+        hubListener.onCallingCanceled();
     }
 
     @Override
