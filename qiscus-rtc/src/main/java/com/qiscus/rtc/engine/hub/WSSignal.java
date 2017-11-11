@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.qiscus.rtc.engine.util.LooperExecutor;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.webrtc.IceCandidate;
@@ -204,6 +205,19 @@ public class WSSignal implements HubSignal, WSChannel.WSChannelEvents {
                     if (success) {
                         channel.state = WSChannel.WSState.LOGGEDIN;
                         events.onLoggedinToRoom();
+
+                        if (response.equals("room_join")) {
+                            String message = data.getString("message");
+                            JSONObject user = new JSONObject(message);
+                            JSONArray users = user.getJSONArray("users");
+
+                            for (int i=0; i<users.length(); i++) {
+                                if (users.get(i).equals(parameters.target)) {
+                                    channel.setTargetId(parameters.target);
+                                    channel.sync();
+                                }
+                            }
+                        }
                     } else {
                         String message = data.getString("message");
                         Log.e(TAG, message);
@@ -217,9 +231,9 @@ public class WSSignal implements HubSignal, WSChannel.WSChannelEvents {
                 JSONObject data = new JSONObject(strData);
 
                 if (event.equals("user_new")) {
-                    if (sender.equals(parameters.target)) {
-                        channel.sync(parameters.target);
-                    }
+                    //if (sender.equals(parameters.target)) {
+                    //    channel.sync(parameters.target);
+                    //}
                 } else if (event.equals("user_leave")) {
                     if (sender.equals(parameters.target)) {
                         events.onClose();
@@ -229,9 +243,13 @@ public class WSSignal implements HubSignal, WSChannel.WSChannelEvents {
                         String evt = data.getString("event");
 
                         if (evt.equals("call_sync")) {
-                            channel.ack(sender);
+                            if (sender.equals(parameters.target)) {
+                                events.onPNReceived();
+                                channel.setTargetId(parameters.target);
+                            }
+                            //channel.ack(sender);
                         } else if (evt.equals("call_ack")) {
-                            events.onPNReceived();
+                            //events.onPNReceived();
                         } else if (evt.equals("call_accept")) {
                             events.onCallAccepted();
                         } else if (evt.equals("call_reject")) {
@@ -256,7 +274,7 @@ public class WSSignal implements HubSignal, WSChannel.WSChannelEvents {
                         }
                     }
                 } else {
-                    Log.e(TAG, "Unknown event.");
+                    Log.e(TAG, "Unknown event: " + msg);
                 }
             }
         } catch (JSONException e) {

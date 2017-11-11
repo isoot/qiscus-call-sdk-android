@@ -41,7 +41,7 @@ public class WSChannel {
     private WebSocket websocket;
     private String room_id;
     private String client_id;
-    private String target_id;
+    public String target_id;
 
     public enum WSState {
         NEW, CONNECTED, LOGGEDIN, CLOSED, ERROR
@@ -244,13 +244,15 @@ public class WSChannel {
         }
     }
 
-    public void sync(String target) {
+    public void setTargetId(String target_id) {
+        this.target_id = target_id;
+    }
+
+    public void sync() {
         if (state != WSState.LOGGEDIN) {
             Log.e(TAG, "Hub sync call in state " + state);
             return;
         }
-
-        this.target_id = target;
 
         try {
             JSONObject object = new JSONObject();
@@ -444,6 +446,7 @@ public class WSChannel {
             return;
         }
 
+        Log.d("DISINI", target_id);
         try {
             JSONObject object = new JSONObject();
             JSONObject data = new JSONObject();

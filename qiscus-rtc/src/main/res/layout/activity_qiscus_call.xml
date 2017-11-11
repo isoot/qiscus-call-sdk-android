@@ -4,25 +4,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.qiscus.rtc.engine.QiscusRTCViewLayout
-        android:id="@+id/local_video_layout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <com.qiscus.rtc.engine.QiscusRTCViewRenderer
-            android:id="@+id/local_video_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-    </com.qiscus.rtc.engine.QiscusRTCViewLayout>
+    <com.qiscus.rtc.engine.QiscusRTCViewRenderer
+        android:id="@+id/local_video_view"
+        android:layout_height="144dp"
+        android:layout_width="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp" />
 
-    <com.qiscus.rtc.engine.QiscusRTCViewLayout
-        android:id="@+id/remote_video_layout"
+    <com.qiscus.rtc.engine.QiscusRTCViewRenderer
+        android:id="@+id/remote_video_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <com.qiscus.rtc.engine.QiscusRTCViewRenderer
-            android:id="@+id/remote_video_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-    </com.qiscus.rtc.engine.QiscusRTCViewLayout>
+        android:layout_height="match_parent" />
 
     <FrameLayout
         android:id="@+id/call_fragment_container"
