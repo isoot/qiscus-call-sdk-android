@@ -147,9 +147,9 @@ public class PCClient {
         }
 
         if (videoEnabled) {
-            videoWidth = 1280;
-            videoHeight = 720;
-            videoFps = 30;
+            videoWidth = 640;
+            videoHeight = 480;
+            videoFps = 24;
         }
 
         audioConstraints = new MediaConstraints();
