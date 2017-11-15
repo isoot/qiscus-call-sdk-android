@@ -304,7 +304,7 @@ public class QiscusCallActivity extends BaseActivity implements CallingFragment.
 
     // Calling Listener
     @Override
-    public void onPNReceived() {
+    public void onPnReceived() {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -336,6 +336,7 @@ public class QiscusCallActivity extends BaseActivity implements CallingFragment.
         EventBus.getDefault().post(callEventData);
     }
 
+    // RTC Listener
     @Override
     public void onCallConnected() {
         QiscusRTC.Call.getInstance().setCallAccepted(true);
@@ -352,7 +353,7 @@ public class QiscusCallActivity extends BaseActivity implements CallingFragment.
     }
 
     @Override
-    public void onPeerDown() {
+    public void onCallEnded() {
         disconnect();
 
         if (QiscusRTC.Call.getCallConfig().getOnCallDisconenctedListener() != null) {
@@ -361,7 +362,7 @@ public class QiscusCallActivity extends BaseActivity implements CallingFragment.
     }
 
     @Override
-    public void onPeerError() {
+    public void onCallError() {
         //
     }
 

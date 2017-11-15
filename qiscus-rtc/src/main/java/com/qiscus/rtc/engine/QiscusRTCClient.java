@@ -235,8 +235,8 @@ public class QiscusRTCClient implements HubSignal.SignalEvents, PCClient.PeerCon
     }
 
     @Override
-    public void onPNReceived() {
-        hubListener.onPNReceived();
+    public void onPnReceived() {
+        hubListener.onPnReceived();
     }
 
     @Override
@@ -256,37 +256,49 @@ public class QiscusRTCClient implements HubSignal.SignalEvents, PCClient.PeerCon
     }
 
     @Override
-    public void onSDPOffer(SessionDescription sdp) {
-        pcClient.setRemoteDescription(sdp);
-        pcClient.createAnswer();
+    public void onRemoteSdp(SessionDescription sdp) {
+        if (sdp.type.canonicalForm().equals("offer")) {
+            pcClient.setRemoteDescription(sdp);
+            pcClient.createAnswer();
+            hubSignal.notifyState("callee_sdp", "REMOTE_OFFER");
+        } else if (sdp.type.canonicalForm().equals("answer")) {
+            pcClient.setRemoteDescription(sdp);
+            hubSignal.notifyState("caller_sdp", "REMOTE_ANSWER");
+        }
     }
 
     @Override
-    public void onSDPAnswer(SessionDescription sdp) {
-        pcClient.setRemoteDescription(sdp);
-    }
-
-    @Override
-    public void onICECandidate(IceCandidate candidate) {
+    public void onRemoteCandidate(IceCandidate candidate) {
         pcClient.addRemoteIceCandidate(candidate);
     }
 
     @Override
     public void onClose() {
-        rtcListener.onPeerDown();
+        rtcListener.onCallEnded();
     }
 
     @Override
     public void onError(String description) {
-        rtcListener.onPeerError();
+        rtcListener.onCallError();
     }
 
     @Override
     public void onLocalDescription(SessionDescription sdp) {
         if (sdp.type.canonicalForm().equals("offer")) {
             hubSignal.sendOffer(sdp);
+            hubSignal.notifyState("caller_sdp", "LOCAL_OFFER");
         } else if (sdp.type.canonicalForm().equals("answer")) {
             hubSignal.sendAnswer(sdp);
+            hubSignal.notifyState("callee_sdp", "LOCAL_ANSWER");
+        }
+    }
+
+    @Override
+    public void onIceState(String state) {
+        if (initiator) {
+            hubSignal.notifyState("caller_ice", state.toString());
+        } else {
+            hubSignal.notifyState("callee_ice", state.toString());
         }
     }
 
@@ -303,12 +315,13 @@ public class QiscusRTCClient implements HubSignal.SignalEvents, PCClient.PeerCon
     @Override
     public void onIceConnected() {
         rtcListener.onCallConnected();
+        hubSignal.notifyConnect();
         setSwappedFeeds(false);
     }
 
     @Override
     public void onIceDisconnected() {
-        rtcListener.onPeerDown();
+        rtcListener.onCallEnded();
     }
 
     @Override
@@ -323,6 +336,6 @@ public class QiscusRTCClient implements HubSignal.SignalEvents, PCClient.PeerCon
 
     @Override
     public void onPeerConnectionError(String description) {
-        rtcListener.onPeerError();
+        rtcListener.onCallError();
     }
 }

@@ -5,7 +5,7 @@ package com.qiscus.rtc.engine.hub;
  */
 
 public interface HubListener {
-    public void onPNReceived();
+    public void onPnReceived();
     public void onCallingAccepted();
     public void onCallingRejected();
     public void onCallingCanceled();

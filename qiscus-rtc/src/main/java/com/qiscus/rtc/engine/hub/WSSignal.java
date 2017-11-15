@@ -245,7 +245,7 @@ public class WSSignal implements HubSignal, WSChannel.WSChannelEvents {
 
                         if (evt.equals("call_ack")) {
                             if (sender.equals(parameters.target)) {
-                                events.onPNReceived();
+                                events.onPnReceived();
                                 channel.setTargetId(parameters.target);
                             }
                         } else if (evt.equals("call_accept")) {
@@ -261,14 +261,14 @@ public class WSSignal implements HubSignal, WSChannel.WSChannelEvents {
                         if (type.equals("offer")) {
                             String description = data.getString("sdp");
                             SessionDescription sdp = new SessionDescription(SessionDescription.Type.fromCanonicalForm("offer"), description);
-                            events.onSDPOffer(sdp);
+                            events.onRemoteSdp(sdp);
                         } else if (type.equals("answer")) {
                             String description = data.getString("sdp");
                             SessionDescription sdp = new SessionDescription(SessionDescription.Type.fromCanonicalForm("answer"), description);
-                            events.onSDPAnswer(sdp);
+                            events.onRemoteSdp(sdp);
                         } else if (type.equals("candidate")) {
                             IceCandidate candidate = new IceCandidate(data.getString("sdpMid"), data.getInt("sdpMLineIndex"), data.getString("candidate"));
-                            events.onICECandidate(candidate);
+                            events.onRemoteCandidate(candidate);
                         }
                     }
                 } else {

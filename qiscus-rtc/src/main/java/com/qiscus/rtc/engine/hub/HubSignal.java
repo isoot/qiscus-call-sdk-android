@@ -26,13 +26,12 @@ public interface HubSignal {
 
     static interface SignalEvents {
         public void onLoggedinToRoom();
-        public void onPNReceived();
+        public void onPnReceived();
         public void onCallAccepted();
         public void onCallRejected();
         public void onCallCanceled();
-        public void onSDPOffer(final SessionDescription sdp);
-        public void onSDPAnswer(final SessionDescription sdp);
-        public void onICECandidate(final IceCandidate candidate);
+        public void onRemoteSdp(final SessionDescription sdp);
+        public void onRemoteCandidate(final IceCandidate candidate);
         public void onClose();
         public void onError(final String description);
     }

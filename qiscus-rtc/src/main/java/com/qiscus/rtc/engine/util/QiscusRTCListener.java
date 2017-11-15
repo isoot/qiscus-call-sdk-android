@@ -8,6 +8,6 @@ import org.webrtc.RendererCommon;
 
 public interface QiscusRTCListener {
     void onCallConnected();
-    void onPeerDown();
-    void onPeerError();
+    void onCallEnded();
+    void onCallError();
 }
