@@ -243,7 +243,9 @@ public class WSSignal implements HubSignal, WSChannel.WSChannelEvents {
                     if (data.has("event")) {
                         String evt = data.getString("event");
 
-                        if (evt.equals("call_ack")) {
+                        if (evt.equals("call_sync")) {
+                            channel.ack();
+                        } else if (evt.equals("call_ack")) {
                             if (sender.equals(parameters.target)) {
                                 events.onPnReceived();
                                 channel.setTargetId(parameters.target);
