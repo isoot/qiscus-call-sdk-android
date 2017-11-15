@@ -181,7 +181,7 @@ public abstract class CallFragment extends Fragment {
         slideDownAnim.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
-
+                onCallListener.onPanelSlide(true);
             }
 
             @Override
@@ -207,7 +207,7 @@ public abstract class CallFragment extends Fragment {
 
             @Override
             public void onAnimationEnd(Animation animation) {
-
+                onCallListener.onPanelSlide(false);
             }
 
             @Override
@@ -242,6 +242,7 @@ public abstract class CallFragment extends Fragment {
         void onMicToggle(boolean micOn);
         void onVideoToggle(boolean videoOn);
         void onCameraSwitch(boolean frontCamera);
+        void onPanelSlide(boolean hidden);
         void onEndCall(long callDurationMillis);
     }
 }

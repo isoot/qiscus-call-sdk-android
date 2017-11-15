@@ -282,6 +282,15 @@ public class QiscusCallActivity extends BaseActivity implements CallingFragment.
     }
 
     @Override
+    public void onPanelSlide(boolean hidden) {
+        if (hidden) {
+            pipRenderer.setVisibility(View.INVISIBLE);
+        } else {
+            pipRenderer.setVisibility(View.VISIBLE);
+        }
+    }
+
+    @Override
     public void onEndCall(long calldurationMillis) {
         if (QiscusRTC.Call.getCallConfig().getOnEndCallClickListener() != null) {
             QiscusRTC.Call.getCallConfig().getOnEndCallClickListener().onClick(callData, calldurationMillis);
