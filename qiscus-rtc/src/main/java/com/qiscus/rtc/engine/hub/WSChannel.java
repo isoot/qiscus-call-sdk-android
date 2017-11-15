@@ -271,13 +271,11 @@ public class WSChannel {
         }
     }
 
-    public void ack(String target) {
+    public void ack() {
         if (state != WSState.LOGGEDIN) {
             Log.e(TAG, "Hub ack call in state " + state);
             return;
         }
-
-        this.target_id = target;
 
         try {
             JSONObject object = new JSONObject();

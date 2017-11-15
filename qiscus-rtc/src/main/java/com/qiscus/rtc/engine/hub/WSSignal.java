@@ -214,7 +214,7 @@ public class WSSignal implements HubSignal, WSChannel.WSChannelEvents {
                             for (int i=0; i<users.length(); i++) {
                                 if (users.get(i).equals(parameters.target)) {
                                     channel.setTargetId(parameters.target);
-                                    channel.sync();
+                                    channel.ack();
                                 }
                             }
                         }
@@ -232,7 +232,7 @@ public class WSSignal implements HubSignal, WSChannel.WSChannelEvents {
 
                 if (event.equals("user_new")) {
                     //if (sender.equals(parameters.target)) {
-                    //    channel.sync(parameters.target);
+                    //    channel.setTargetId(parameters.target);
                     //}
                 } else if (event.equals("user_leave")) {
                     if (sender.equals(parameters.target)) {
@@ -242,14 +242,11 @@ public class WSSignal implements HubSignal, WSChannel.WSChannelEvents {
                     if (data.has("event")) {
                         String evt = data.getString("event");
 
-                        if (evt.equals("call_sync")) {
+                        if (evt.equals("call_ack")) {
                             if (sender.equals(parameters.target)) {
                                 events.onPNReceived();
                                 channel.setTargetId(parameters.target);
                             }
-                            //channel.ack(sender);
-                        } else if (evt.equals("call_ack")) {
-                            //events.onPNReceived();
                         } else if (evt.equals("call_accept")) {
                             events.onCallAccepted();
                         } else if (evt.equals("call_reject")) {
@@ -271,6 +268,36 @@ public class WSSignal implements HubSignal, WSChannel.WSChannelEvents {
                         } else if (type.equals("candidate")) {
                             IceCandidate candidate = new IceCandidate(data.getString("sdpMid"), data.getInt("sdpMLineIndex"), data.getString("candidate"));
                             events.onICECandidate(candidate);
+                        }
+                    }
+                } else if (event.equals("room_data")) {
+                    if (sender.equals(parameters.target)) {
+                        if (data.has("event")) {
+                            String evt = data.getString("event");
+
+                            if (evt.equals("call_accept")) {
+                                events.onCallAccepted();
+                                channel.setTargetId(parameters.target);
+                            } else if (evt.equals("call_reject")) {
+                                events.onCallRejected();
+                            } else if (evt.equals("call_cancel")) {
+                                events.onCallCanceled();
+                            }
+                        } else if (data.has("type")) {
+                            String type = data.getString("type");
+
+                            if (type.equals("offer")) {
+                                String description = data.getString("sdp");
+                                SessionDescription sdp = new SessionDescription(SessionDescription.Type.fromCanonicalForm("offer"), description);
+                                events.onSDPOffer(sdp);
+                            } else if (type.equals("answer")) {
+                                String description = data.getString("sdp");
+                                SessionDescription sdp = new SessionDescription(SessionDescription.Type.fromCanonicalForm("answer"), description);
+                                events.onSDPAnswer(sdp);
+                            } else if (type.equals("candidate")) {
+                                IceCandidate candidate = new IceCandidate(data.getString("sdpMid"), data.getInt("sdpMLineIndex"), data.getString("candidate"));
+                                events.onICECandidate(candidate);
+                            }
                         }
                     }
                 } else {
