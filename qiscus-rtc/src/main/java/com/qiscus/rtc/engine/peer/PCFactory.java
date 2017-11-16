@@ -148,6 +148,7 @@ public class PCFactory {
 
     public void dispose() {
         if (peerConnectionFactory != null) {
+            peerConnectionFactory.dispose();
             peerConnectionFactory = null;
             PeerConnectionFactory.stopInternalTracingCapture();
             PeerConnectionFactory.shutdownInternalTracer();
