@@ -119,6 +119,7 @@ public class PCClient {
         preferIsac = false;
         renderVideo = videoEnabled;
         videoCapturerStopped = false;
+        localSdp = null;
     }
 
     public void createPeerConnection(final EglBase.Context renderEGLContext, final VideoRenderer.Callbacks localRender, final List<VideoRenderer.Callbacks> remoteRenders, final VideoCapturer videoCapturer) {
