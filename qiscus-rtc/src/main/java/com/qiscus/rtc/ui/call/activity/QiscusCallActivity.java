@@ -250,12 +250,23 @@ public class QiscusCallActivity extends BaseActivity implements CallingFragment.
     @Override
     public void onRejectPressed() {
         rtcClient.rejectCall();
-        disconnect();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                disconnect();
+            }
+        });
     }
 
     @Override
     public void onCancelPressed() {
-        disconnect();
+        rtcClient.cancelCall();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                disconnect();
+            }
+        });
     }
 
     // Call Fragment Listener
@@ -343,14 +354,24 @@ public class QiscusCallActivity extends BaseActivity implements CallingFragment.
     public void onCallingRejected() {
         callEventData.setCallEvent(QiscusRTC.CallEvent.REJECT);
         EventBus.getDefault().post(callEventData);
-        disconnect();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                disconnect();
+            }
+        });
     }
 
     @Override
     public void onCallingCanceled() {
         callEventData.setCallEvent(QiscusRTC.CallEvent.CANCEL);
         EventBus.getDefault().post(callEventData);
-        disconnect();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                disconnect();
+            }
+        });
     }
 
     // RTC Listener
@@ -376,12 +397,22 @@ public class QiscusCallActivity extends BaseActivity implements CallingFragment.
             QiscusRTC.Call.getCallConfig().getOnCallDisconenctedListener().onDisconnect(callFragment != null ? callFragment.getCallDurationMillis() : 0);
         }
 
-        disconnect();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                disconnect();
+            }
+        });
     }
 
     @Override
     public void onCallError() {
-        disconnect();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                disconnect();
+            }
+        });
     }
 
     private void disconnect() {

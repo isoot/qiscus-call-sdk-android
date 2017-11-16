@@ -119,6 +119,10 @@ public class QiscusRTCClient implements HubSignal.SignalEvents, PCClient.PeerCon
         hubSignal.rejectCall();
     }
 
+    public void cancelCall() {
+        hubSignal.cancelCall();
+    }
+
     public void end() {
         if (pcClient != null) {
             pcClient.close();

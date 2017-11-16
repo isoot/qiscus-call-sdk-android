@@ -348,6 +348,29 @@ public class WSChannel {
         }
     }
 
+    public void cancelCall() {
+        if (state != WSState.LOGGEDIN) {
+            Log.e(TAG, "Hub reject call in state " + state);
+            return;
+        }
+
+        try {
+            JSONObject object = new JSONObject();
+            JSONObject data = new JSONObject();
+            object.put("request", "room_data");
+            object.put("room", room_id);
+            object.put("recipient", target_id);
+            data.put("event", "call_cancel");
+            object.put("data", data.toString());
+
+            Log.d(TAG, "C->WSS: " + object.toString());
+
+            websocket.send(object.toString());
+        } catch (JSONException e) {
+            Log.e(TAG, "Hub cancel call error: " + e.getMessage());
+        }
+    }
+
     public void endCall() {
         if (state != WSState.LOGGEDIN) {
             Log.e(TAG, "Hub end call in state " + state);

@@ -64,6 +64,16 @@ public class WSSignal implements HubSignal, WSChannel.WSChannelEvents {
     }
 
     @Override
+    public void cancelCall() {
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                channel.cancelCall();
+            }
+        });
+    }
+
+    @Override
     public void endCall() {
         executor.execute(new Runnable() {
             @Override
