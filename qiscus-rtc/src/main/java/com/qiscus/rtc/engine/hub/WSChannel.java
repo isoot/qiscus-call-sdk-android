@@ -39,9 +39,10 @@ public class WSChannel {
     private final WSChannelEvents event;
 
     private WebSocket websocket;
+    private boolean pendingSendAccept;
     private String room_id;
     private String client_id;
-    public String target_id;
+    private String target_id;
 
     public enum WSState {
         NEW, CONNECTED, LOGGEDIN, CLOSED, ERROR
@@ -294,26 +295,31 @@ public class WSChannel {
         }
     }
 
+    public boolean getPendingSendAccept() {
+        return pendingSendAccept;
+    }
+
     public void acceptCall() {
         if (state != WSState.LOGGEDIN) {
-            Log.e(TAG, "Hub accept call in state " + state);
+            Log.e(TAG, "Hub accept call in state " + state + ". Waiting for logged in");
+            pendingSendAccept = true;
             return;
-        }
+        } else {
+            try {
+                JSONObject object = new JSONObject();
+                JSONObject data = new JSONObject();
+                object.put("request", "room_data");
+                object.put("room", room_id);
+                object.put("recipient", target_id);
+                data.put("event", "call_accept");
+                object.put("data", data.toString());
 
-        try {
-            JSONObject object = new JSONObject();
-            JSONObject data = new JSONObject();
-            object.put("request", "room_data");
-            object.put("room", room_id);
-            object.put("recipient", target_id);
-            data.put("event", "call_accept");
-            object.put("data", data.toString());
+                Log.d(TAG, "C->WSS: " + object.toString());
 
-            Log.d(TAG, "C->WSS: " + object.toString());
-
-            websocket.send(object.toString());
-        } catch (JSONException e) {
-            Log.e(TAG, "Hub accept call error: " + e.getMessage());
+                websocket.send(object.toString());
+            } catch (JSONException e) {
+                Log.e(TAG, "Hub accept call error: " + e.getMessage());
+            }
         }
     }
 
