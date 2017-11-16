@@ -149,10 +149,10 @@ public class PCFactory {
     public void dispose() {
         if (peerConnectionFactory != null) {
             peerConnectionFactory = null;
+            PeerConnectionFactory.stopInternalTracingCapture();
+            PeerConnectionFactory.shutdownInternalTracer();
         }
 
-        PeerConnectionFactory.stopInternalTracingCapture();
-        PeerConnectionFactory.shutdownInternalTracer();
         options = null;
     }
 }
