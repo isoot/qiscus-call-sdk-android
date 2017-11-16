@@ -92,7 +92,18 @@ public class QiscusCallActivity extends BaseActivity implements CallingFragment.
                     disconnect();
                 }
             }
-        }, 45000);
+        }, 30000);
+    }
+
+    private void autoDisconnect2() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (!QiscusRTC.Call.getInstance().getCallConnected()) {
+                    disconnect();
+                }
+            }
+        }, 15000);
     }
 
     @Override
@@ -109,8 +120,9 @@ public class QiscusCallActivity extends BaseActivity implements CallingFragment.
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
+        Thread.setDefaultUncaughtExceptionHandler(null);
         disconnect();
+        super.onDestroy();
     }
 
     @Override
@@ -224,10 +236,12 @@ public class QiscusCallActivity extends BaseActivity implements CallingFragment.
     // Calling Fragment Listener
     @Override
     public void onAcceptPressed() {
+        QiscusRTC.Call.getInstance().setCallAccepted(true);
         rtcClient.acceptCall();
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                autoDisconnect2();
                 callingFragment.setTvCallState("Connecting");
             }
         });
@@ -236,7 +250,7 @@ public class QiscusCallActivity extends BaseActivity implements CallingFragment.
     @Override
     public void onRejectPressed() {
         rtcClient.rejectCall();
-        finish();
+        disconnect();
     }
 
     @Override
@@ -319,6 +333,7 @@ public class QiscusCallActivity extends BaseActivity implements CallingFragment.
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                autoDisconnect2();
                 callingFragment.setTvCallState("Connecting");
             }
         });
@@ -328,18 +343,21 @@ public class QiscusCallActivity extends BaseActivity implements CallingFragment.
     public void onCallingRejected() {
         callEventData.setCallEvent(QiscusRTC.CallEvent.REJECT);
         EventBus.getDefault().post(callEventData);
+        disconnect();
     }
 
     @Override
     public void onCallingCanceled() {
         callEventData.setCallEvent(QiscusRTC.CallEvent.CANCEL);
         EventBus.getDefault().post(callEventData);
+        disconnect();
     }
 
     // RTC Listener
     @Override
     public void onCallConnected() {
         QiscusRTC.Call.getInstance().setCallAccepted(true);
+        QiscusRTC.Call.getInstance().setCallConnected(true);
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -354,29 +372,31 @@ public class QiscusCallActivity extends BaseActivity implements CallingFragment.
 
     @Override
     public void onCallEnded() {
-        disconnect();
-
         if (QiscusRTC.Call.getCallConfig().getOnCallDisconenctedListener() != null) {
             QiscusRTC.Call.getCallConfig().getOnCallDisconenctedListener().onDisconnect(callFragment != null ? callFragment.getCallDurationMillis() : 0);
         }
+
+        disconnect();
     }
 
     @Override
     public void onCallError() {
-        //
+        disconnect();
     }
 
     private void disconnect() {
         NotificationManagerCompat.from(this).cancel(ON_GOING_NOTIF_ID);
         releaseProximity();
-        QiscusRTC.Call.getInstance().setCallAccepted(false);
 
         if (rtcClient != null) {
             try {
                 rtcClient.end();
                 rtcClient = null;
+                pipRenderer.release();
                 pipRenderer = null;
+                fullscreenRenderer.release();
                 fullscreenRenderer = null;
+                RingManager.getInstance(this).stop();
             } catch (Exception e) {
                 e.printStackTrace();
             }

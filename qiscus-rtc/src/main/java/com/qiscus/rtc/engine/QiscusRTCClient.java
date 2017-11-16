@@ -127,17 +127,17 @@ public class QiscusRTCClient implements HubSignal.SignalEvents, PCClient.PeerCon
 
         if (pipRenderer != null) {
             pipRenderer.release();
+            pipRenderer = null;
         }
 
         if (fullscreenRenderer != null) {
             fullscreenRenderer.release();
+            fullscreenRenderer = null;
         }
 
-        if (pcFactory != null) {
-            if (pcClient == null) {
-                pcFactory.dispose();
-                pcFactory = null;
-            }
+        if (rootEglBase != null) {
+            rootEglBase.release();
+            rootEglBase = null;
         }
 
         if (hubSignal != null) {

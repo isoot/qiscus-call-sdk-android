@@ -524,6 +524,7 @@ public class WSChannel {
 
         if (websocket != null) {
             websocket.close();
+            websocket = null;
         }
     }
 }

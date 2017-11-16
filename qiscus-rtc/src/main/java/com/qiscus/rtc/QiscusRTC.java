@@ -331,7 +331,7 @@ public class QiscusRTC {
 
         private CallType callType = CallType.VOICE;
         private boolean accepted = false;
-        private boolean delivered = false;
+        private boolean connected = false;
 
         /**
          * Get QiscusRTC call instance.
@@ -380,7 +380,7 @@ public class QiscusRTC {
         }
 
         /**
-         * Set call type, default call type is VOICE.
+         * Set wether call has accepted.
          *
          * @param accepted - boolean true / file
          */
@@ -389,7 +389,7 @@ public class QiscusRTC {
         }
 
         /**
-         * Get call type.
+         * Get call accepted.
          *
          * @return boolean true / false
          */
@@ -399,22 +399,22 @@ public class QiscusRTC {
         }
 
         /**
-         * Set call type, default call type is VOICE.
+         * Set wether call has connected.
          *
-         * @param delivered - boolean true / file
+         * @param connected - boolean true / file
          */
-        public void setCallDelivered(boolean delivered) {
-            this.delivered = delivered;
+        public void setCallConnected(boolean connected) {
+            this.connected = connected;
         }
 
         /**
-         * Get call type.
+         * Get call connected.
          *
          * @return boolean true / false
          */
         @NonNull
-        public boolean getCallDelivered() {
-            return delivered;
+        public boolean getCallConnected() {
+            return connected;
         }
 
         /**

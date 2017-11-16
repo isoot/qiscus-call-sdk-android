@@ -157,14 +157,22 @@ public class WSSignal implements HubSignal, WSChannel.WSChannelEvents {
         executor.execute(new Runnable() {
             @Override
             public void run() {
-                channel.close();
+                if (channel != null) {
+                    channel.close();
+                    channel = null;
+                }
             }
         });
 
         executor.requestStop();
+        executor.interrupt();
 
-        if (heartbeat.isAlive()) {
-            heartbeat.interrupt();
+        if (heartbeat != null) {
+            if (heartbeat.isAlive()) {
+                heartbeat.interrupt();
+            }
+
+            heartbeat = null;
         }
     }
 

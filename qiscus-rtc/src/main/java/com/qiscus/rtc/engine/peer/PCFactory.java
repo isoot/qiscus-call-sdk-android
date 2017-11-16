@@ -1,6 +1,7 @@
 package com.qiscus.rtc.engine.peer;
 
 import android.content.Context;
+import android.os.Handler;
 import android.util.Log;
 
 import org.webrtc.AudioSource;
@@ -147,7 +148,7 @@ public class PCFactory {
 
     public void dispose() {
         if (peerConnectionFactory != null) {
-            peerConnectionFactory.dispose();
+            peerConnectionFactory = null;
         }
 
         PeerConnectionFactory.stopInternalTracingCapture();
