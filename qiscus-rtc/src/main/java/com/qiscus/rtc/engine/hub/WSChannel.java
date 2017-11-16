@@ -305,6 +305,8 @@ public class WSChannel {
             pendingSendAccept = true;
             return;
         } else {
+            pendingSendAccept = false;
+
             try {
                 JSONObject object = new JSONObject();
                 JSONObject data = new JSONObject();
