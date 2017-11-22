@@ -51,7 +51,7 @@ public class WebSocketClient implements HubSignal, WebSocketChannel.WebSocketCha
     }
 
     @Override
-    public void onWebSocketMessage(String msg) {git
+    public void onWebSocketMessage(String msg) {
         try {
             JSONObject object = new JSONObject(msg);
 
