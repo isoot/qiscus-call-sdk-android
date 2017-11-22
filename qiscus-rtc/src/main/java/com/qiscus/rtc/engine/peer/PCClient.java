@@ -3,8 +3,6 @@ package com.qiscus.rtc.engine.peer;
 import android.content.Context;
 import android.util.Log;
 
-import com.qiscus.rtc.engine.util.LooperExecutor;
-
 import org.webrtc.AudioSource;
 import org.webrtc.AudioTrack;
 import org.webrtc.CameraVideoCapturer;
@@ -29,6 +27,8 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -66,9 +66,8 @@ public class PCClient {
 
     private final PCClient.PCObserver pcObserver = new PCClient.PCObserver();
     private final PCClient.SDPObserver sdpObserver = new PCClient.SDPObserver();
-    private final LooperExecutor executor;
+    private final ExecutorService executor;
 
-    private Context context;
     private PeerConnection peerConnection;
     private PCClient.PeerConnectionEvents events;
     private AudioSource audioSource;
@@ -100,17 +99,17 @@ public class PCClient {
     private String preferredVideoCodec = VIDEO_CODEC_VP9;
 
     private PCClient() {
-        executor = new LooperExecutor();
-        executor.requestStart();
+        // Executor thread is started once in private ctor and is used for all
+        // peer connection API calls to ensure new peer connection factory is
+        // created on the same thread as previously destroyed factory.
+        executor = Executors.newSingleThreadExecutor();
     }
 
     public static PCClient getInstance() {
         return instance;
     }
 
-    public void init(final Context context, final PCFactory pcFactory, boolean videoEnabled, final PCClient.PeerConnectionEvents events) {
-        this.context = context;
-        this.pcFactory = pcFactory;
+    public void init(Context context, boolean videoEnabled, PCClient.PeerConnectionEvents events) {
         this.videoEnabled = videoEnabled;
         this.events = events;
         isInitiator = false;
@@ -120,6 +119,17 @@ public class PCClient {
         renderVideo = videoEnabled;
         videoCapturerStopped = false;
         localSdp = null;
+
+        createPeerConnectionFactory(context);
+    }
+
+    public void createPeerConnectionFactory(final Context context) {
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                pcFactory = new PCFactory(context);
+            }
+        });
     }
 
     public void createPeerConnection(final EglBase.Context renderEGLContext, final VideoRenderer.Callbacks localRender, final List<VideoRenderer.Callbacks> remoteRenders, final VideoCapturer videoCapturer) {
@@ -419,7 +429,12 @@ public class PCClient {
     }
 
     public void close() {
-        closeInternal();
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                closeInternal();
+            }
+        });
     }
 
     private void closeInternal() {

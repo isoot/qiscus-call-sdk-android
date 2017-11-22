@@ -7,7 +7,6 @@ import com.qiscus.rtc.engine.hub.HubListener;
 import com.qiscus.rtc.engine.hub.HubSignal;
 import com.qiscus.rtc.engine.hub.WebSocketClient;
 import com.qiscus.rtc.engine.peer.PCClient;
-import com.qiscus.rtc.engine.peer.PCFactory;
 import com.qiscus.rtc.engine.util.QiscusRTCListener;
 
 import org.webrtc.Camera1Enumerator;
@@ -55,7 +54,6 @@ public class QiscusRTCClient implements HubSignal.SignalEvents, PCClient.PeerCon
     private final List<VideoRenderer.Callbacks> remoteRenderers = new ArrayList<VideoRenderer.Callbacks>();
     private final Context context;
 
-    private PCFactory pcFactory;
     private PCClient pcClient;
     private EglBase rootEglBase;
     private SurfaceViewRenderer pipRenderer;
@@ -73,7 +71,6 @@ public class QiscusRTCClient implements HubSignal.SignalEvents, PCClient.PeerCon
         this.rtcListener = rtcListener;
         this.hubListener = hubListener;
 
-        pcFactory = new PCFactory(context);
         rootEglBase = EglBase.create();
         remoteRenderers.add(remoteProxyRenderer);
 
@@ -101,7 +98,7 @@ public class QiscusRTCClient implements HubSignal.SignalEvents, PCClient.PeerCon
         }
 
         pcClient = PCClient.getInstance();
-        pcClient.init(context, pcFactory, videoEnabled, QiscusRTCClient.this);
+        pcClient.init(context, videoEnabled, QiscusRTCClient.this);
         pcClient.createPeerConnection(rootEglBase.getEglBaseContext(), localProxyRenderer, remoteRenderers, videoCapturer);
     }
 
