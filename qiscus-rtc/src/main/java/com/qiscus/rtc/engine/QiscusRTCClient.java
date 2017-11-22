@@ -5,10 +5,9 @@ import android.util.Log;
 
 import com.qiscus.rtc.engine.hub.HubListener;
 import com.qiscus.rtc.engine.hub.HubSignal;
-import com.qiscus.rtc.engine.hub.WSSignal;
+import com.qiscus.rtc.engine.hub.WebSocketClient;
 import com.qiscus.rtc.engine.peer.PCClient;
 import com.qiscus.rtc.engine.peer.PCFactory;
-import com.qiscus.rtc.engine.util.LooperExecutor;
 import com.qiscus.rtc.engine.util.QiscusRTCListener;
 
 import org.webrtc.Camera1Enumerator;
@@ -66,9 +65,6 @@ public class QiscusRTCClient implements HubSignal.SignalEvents, PCClient.PeerCon
     private QiscusRTCListener rtcListener;
     private boolean initiator;
     private boolean videoEnabled;
-    private boolean isSwappedFeeds;
-    private String clientId;
-    private String roomId;
 
     public QiscusRTCClient(Context context, SurfaceViewRenderer pipRenderer, SurfaceViewRenderer fullscreenRenderer, HubListener hubListener, QiscusRTCListener rtcListener) {
         this.context = context;
@@ -92,13 +88,11 @@ public class QiscusRTCClient implements HubSignal.SignalEvents, PCClient.PeerCon
     }
 
     public void start(String clientId, String roomId, boolean initiator, boolean videoEnabled, String target) {
-        this.clientId = clientId;
-        this.roomId = roomId;
         this.initiator = initiator;
         this.videoEnabled = videoEnabled;
 
         HubSignal.SignalParameters parameters = new HubSignal.SignalParameters(clientId, roomId, initiator, videoEnabled, target);
-        hubSignal = new WSSignal(QiscusRTCClient.this, parameters, new LooperExecutor());
+        hubSignal = new WebSocketClient(QiscusRTCClient.this, parameters);
         hubSignal.connect();
 
         VideoCapturer videoCapturer = null;
@@ -145,7 +139,7 @@ public class QiscusRTCClient implements HubSignal.SignalEvents, PCClient.PeerCon
         }
 
         if (hubSignal != null) {
-            hubSignal.close();
+            hubSignal.disconnect();
             hubSignal = null;
         }
     }
@@ -308,7 +302,7 @@ public class QiscusRTCClient implements HubSignal.SignalEvents, PCClient.PeerCon
 
     @Override
     public void onIceCandidate(IceCandidate candidate) {
-        hubSignal.trickleCandidate(candidate);
+        hubSignal.sendCandidate(candidate);
     }
 
     @Override

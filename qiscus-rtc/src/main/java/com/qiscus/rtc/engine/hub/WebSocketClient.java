@@ -47,16 +47,11 @@ public class WebSocketClient implements HubSignal, WebSocketChannel.WebSocketCha
     @Override
     public void onWebSocketOpen() {
         roomState = ConnectionState.CONNECTED;
+        wsChannel.register(parameters.clientId);
     }
 
     @Override
-    public void onWebSocketMessage(String msg) {
-        if (wsChannel.getState() != WebSocketChannel.WebSocketConnectionState.REGISTERED
-                || wsChannel.getState() != WebSocketChannel.WebSocketConnectionState.LOGGEDIN) {
-            Log.e(TAG, "Got WebSocket message in non registered or non logged in state");
-            return;
-        }
-
+    public void onWebSocketMessage(String msg) {git
         try {
             JSONObject object = new JSONObject(msg);
 
@@ -197,6 +192,7 @@ public class WebSocketClient implements HubSignal, WebSocketChannel.WebSocketCha
             @Override
             public void run() {
                 wsChannel = new WebSocketChannel(handler, WebSocketClient.this);
+                wsChannel.connect();
             }
         });
     }
@@ -292,11 +288,16 @@ public class WebSocketClient implements HubSignal, WebSocketChannel.WebSocketCha
     }
 
     @Override
-    public void trickleCandidate(IceCandidate candidate) {
+    public void sendCandidate(final IceCandidate candidate) {
         handler.post(new Runnable() {
             @Override
             public void run() {
+                if (roomState != ConnectionState.CONNECTED) {
+                    reportError("Sending candidate SDP in non connected state");
+                    return;
+                }
 
+                wsChannel.sendCandidate(candidate);
             }
         });
     }
@@ -306,17 +307,27 @@ public class WebSocketClient implements HubSignal, WebSocketChannel.WebSocketCha
         handler.post(new Runnable() {
             @Override
             public void run() {
+                if (roomState != ConnectionState.CONNECTED) {
+                    reportError("Sending connect signal in non connected state");
+                    return;
+                }
 
+                wsChannel.notifyConnect();
             }
         });
     }
 
     @Override
-    public void notifyState(String state, String value) {
+    public void notifyState(final String state, final String value) {
         handler.post(new Runnable() {
             @Override
             public void run() {
+                if (roomState != ConnectionState.CONNECTED) {
+                    reportError("Sending state signal in non connected state");
+                    return;
+                }
 
+                wsChannel.notifyState(state, value);
             }
         });
     }
@@ -332,11 +343,19 @@ public class WebSocketClient implements HubSignal, WebSocketChannel.WebSocketCha
     }
 
     @Override
-    public void close() {
+    public void disconnect() {
         handler.post(new Runnable() {
             @Override
             public void run() {
+                Log.d(TAG, "Disconnecting, state: " + roomState);
 
+                roomState = ConnectionState.CLOSED;
+
+                if (wsChannel != null) {
+                    wsChannel.disconnect(true);
+                }
+
+                handler.getLooper().quit();
             }
         });
     }

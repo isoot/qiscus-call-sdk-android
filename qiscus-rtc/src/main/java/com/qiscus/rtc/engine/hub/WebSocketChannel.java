@@ -7,6 +7,7 @@ import com.qiscus.rtc.QiscusRTC;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.webrtc.IceCandidate;
 import org.webrtc.SessionDescription;
 
 import java.net.URI;
@@ -111,7 +112,6 @@ public class WebSocketChannel {
 
         Log.d(TAG, "Registering WebSocket for client  " + client_id);
 
-        JSONObject json = new JSONObject();
         try {
             JSONObject object = new JSONObject();
             JSONObject data = new JSONObject();
@@ -121,9 +121,9 @@ public class WebSocketChannel {
             data.put("username", client_id);
             object.put("data", data.toString());
 
-            Log.d(TAG, "C->WSS: " + json.toString());
+            Log.d(TAG, "C->WSS: " + object.toString());
 
-            ws.sendTextMessage(json.toString());
+            ws.sendTextMessage(object.toString());
 
             // Send any previously accumulated messages.
             for (String sendMessage : wsSendQueue) {
@@ -439,6 +439,75 @@ public class WebSocketChannel {
         }
     }
 
+    public void sendCandidate(IceCandidate cnd) {
+        if (state != WebSocketConnectionState.LOGGEDIN) {
+            Log.w(TAG, "WebSocket send trickle in state " + state);
+            return;
+        }
+
+        try {
+            JSONObject object = new JSONObject();
+            JSONObject data = new JSONObject();
+            object.put("request", "room_data");
+            object.put("room", room_id);
+            object.put("recipient", target_id);
+            data.put("type", "candidate");
+            data.put("sdpMid", cnd.sdpMid);
+            data.put("sdpMLineIndex", cnd.sdpMLineIndex);
+            data.put("candidate", cnd.sdp);
+            object.put("data", data.toString());
+
+            Log.d(TAG, "C->WSS: " + object.toString());
+
+            ws.sendTextMessage(object.toString());
+        } catch (JSONException e) {
+            Log.e(TAG, "WebSocket send candidate error: " + e.getMessage());
+        }
+    }
+
+    public void disconnect(boolean waitForComplete) {
+        checkIfCalledOnValidThread();
+
+        Log.d(TAG, "Disconnect WebSocket. State: " + state);
+
+        if (state == WebSocketConnectionState.LOGGEDIN) {
+            // Send "unregister" to WebSocket server.
+            try {
+                JSONObject object = new JSONObject();
+                object.put("request", "unregister");
+
+                Log.d(TAG, "C->WSS: " + object.toString());
+
+                ws.sendTextMessage(object.toString());
+            } catch (JSONException e) {
+                Log.e(TAG, "WebSocket unregister error: " + e.getMessage());
+            }
+
+            state = WebSocketConnectionState.CONNECTED;
+        }
+
+        // Close WebSocket in CONNECTED or ERROR states only.
+        if (state == WebSocketConnectionState.CONNECTED || state == WebSocketConnectionState.ERROR) {
+            ws.disconnect();
+            state = WebSocketConnectionState.CLOSED;
+
+            if (waitForComplete) {
+                synchronized (closeEventLock) {
+                    while (!closeEvent) {
+                        try {
+                            closeEventLock.wait(1000);
+                            break;
+                        } catch (InterruptedException e) {
+                            Log.e(TAG, "Wait error: " + e.toString());
+                        }
+                    }
+                }
+            }
+        }
+
+        Log.d(TAG, "Disconnecting WebSocket done");
+    }
+
     public void send(String message) {
         checkIfCalledOnValidThread();
 
@@ -481,6 +550,7 @@ public class WebSocketChannel {
                 @Override
                 public void run() {
                     state = WebSocketConnectionState.CONNECTED;
+                    events.onWebSocketOpen();
 
                     // Check if we have pending register request.
                     if (client_id != null) {

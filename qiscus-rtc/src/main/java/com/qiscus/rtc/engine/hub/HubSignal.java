@@ -43,10 +43,10 @@ public interface HubSignal {
     public void endCall();
     public void sendOffer(SessionDescription sdp);
     public void sendAnswer(SessionDescription sdp);
-    public void trickleCandidate(IceCandidate candidate);
+    public void sendCandidate(IceCandidate candidate);
     public void notifyConnect();
     public void notifyState(String state, String value);
     public void ping();
-    public void close();
+    public void disconnect();
 }
 
