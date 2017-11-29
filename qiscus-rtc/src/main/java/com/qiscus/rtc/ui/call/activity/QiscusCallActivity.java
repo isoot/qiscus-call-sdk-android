@@ -70,18 +70,23 @@ public class QiscusCallActivity extends BaseActivity implements CallingFragment.
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         parseIntentData();
-        initView();
-        requestPermission(permissions);
-        setAlwaysOn();
-        setFullscreen();
-        configureProximity();
-        autoDisconnect();
+        if (callData != null) {
+            initView();
+            requestPermission(permissions);
+            setAlwaysOn();
+            setFullscreen();
+            configureProximity();
+            autoDisconnect();
 
-        if (QiscusRTC.Call.getCallConfig().isOngoingNotificationEnable()) {
-            showOnGoingCallNotification();
+            if (QiscusRTC.Call.getCallConfig().isOngoingNotificationEnable()) {
+                showOnGoingCallNotification();
+            }
+
+            callEventData = new QiscusRTC.CallEventData();
+        } else {
+            finish();
         }
 
-        callEventData = new QiscusRTC.CallEventData();
     }
 
     private void autoDisconnect() {
@@ -121,6 +126,7 @@ public class QiscusCallActivity extends BaseActivity implements CallingFragment.
     @Override
     protected void onDestroy() {
         Thread.setDefaultUncaughtExceptionHandler(null);
+        NotificationManagerCompat.from(this).cancel(ON_GOING_NOTIF_ID);
         disconnect();
         super.onDestroy();
     }
@@ -155,7 +161,7 @@ public class QiscusCallActivity extends BaseActivity implements CallingFragment.
     }
 
     private void releaseProximity() {
-        if (callData.getCallType() == QiscusRTC.CallType.VOICE) {
+        if (callData != null && callData.getCallType() == QiscusRTC.CallType.VOICE) {
             try {
                 if (wakeLock.isHeld()) {
                     wakeLock.release();
@@ -216,21 +222,26 @@ public class QiscusCallActivity extends BaseActivity implements CallingFragment.
     }
 
     private void initView() {
-        pipRenderer = (SurfaceViewRenderer) findViewById(R.id.local_video_view);
-        fullscreenRenderer = (SurfaceViewRenderer) findViewById(R.id.remote_video_view);
-        rtcClient = new QiscusRTCClient(QiscusCallActivity.this, pipRenderer, fullscreenRenderer, this, this);
-        callFragmentContainer = (FrameLayout) findViewById(R.id.call_fragment_container);
-        pipRenderer.setVisibility(callData.getCallType() == QiscusRTC.CallType.VOICE ? View.GONE : View.VISIBLE);
-        fullscreenRenderer.setVisibility(callData.getCallType() == QiscusRTC.CallType.VOICE ? View.GONE : View.VISIBLE);
+        if (callData != null) {
+            pipRenderer = (SurfaceViewRenderer) findViewById(R.id.local_video_view);
+            fullscreenRenderer = (SurfaceViewRenderer) findViewById(R.id.remote_video_view);
+            rtcClient = new QiscusRTCClient(QiscusCallActivity.this, pipRenderer, fullscreenRenderer, this, this);
+            callFragmentContainer = (FrameLayout) findViewById(R.id.call_fragment_container);
+            pipRenderer.setVisibility(callData.getCallType() == QiscusRTC.CallType.VOICE ? View.GONE : View.VISIBLE);
+            fullscreenRenderer.setVisibility(callData.getCallType() == QiscusRTC.CallType.VOICE ? View.GONE : View.VISIBLE);
 
-        callFragmentContainer.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (callData.getCallType() == QiscusRTC.CallType.VIDEO && callFragment != null) {
-                    callFragment.hidePanelButton();
+            callFragmentContainer.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (callData.getCallType() == QiscusRTC.CallType.VIDEO && callFragment != null) {
+                        callFragment.hidePanelButton();
+                    }
                 }
-            }
-        });
+            });
+        } else {
+            finish();
+        }
+
     }
 
     // Calling Fragment Listener
@@ -294,7 +305,8 @@ public class QiscusCallActivity extends BaseActivity implements CallingFragment.
             QiscusRTC.Call.getCallConfig().getOnVideoClickListener().onClick(videoOn);
         }
 
-        rtcClient.setVideoEnabled(videoOn);
+        pipRenderer.setEnabled(videoOn);
+        rtcClient.setVideoPipEnabled(videoOn);
     }
 
     @Override

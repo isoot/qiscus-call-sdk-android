@@ -362,6 +362,20 @@ public class PCClient {
         });
     }
 
+    public void setVideoPipEnabled(final boolean enable) {
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                renderVideo = enable;
+
+                if (localVideoTrack != null) {
+                    localVideoTrack.setEnabled(renderVideo);
+                }
+            }
+        });
+    }
+
+
     public void switchCamera() {
         executor.execute(new Runnable() {
             @Override
