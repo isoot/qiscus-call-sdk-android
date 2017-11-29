@@ -59,6 +59,8 @@ Init Qiscus at your application
 
 Parameters:
 * context: context
+* app_id: String
+* app_secret: String
 
 ```java
 public class SampleApplication extends Application {
@@ -70,6 +72,26 @@ public class SampleApplication extends Application {
 }
 ```
 To get your `app_id` and `app_secret`, please [contact us](https://www.qiscus.com/contactus).
+
+### Init with custom host
+
+Qiscus also provides on-premise package, so you can host signaling server on your own network. Please [contact us](https://www.qiscus.com/contactus) to get further information.
+
+Parameters:
+* context: context
+* app_id: String
+* app_secret: String
+* host: String
+
+```java
+public class SampleApplication extends Application {
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        QiscusRTC.init(this, app_id, app_secret, host);
+    }
+}
+```
 
 ## Method
 
