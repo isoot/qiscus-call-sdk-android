@@ -25,7 +25,7 @@ allprojects {
 
 ```groovy
 dependencies {
-  compile 'com.github.qiscus:qiscus-rtc-sdk-android:0.6'
+  compile 'com.github.qiscus:qiscus-rtc-sdk-android:0.7'
 }
 ```
 
