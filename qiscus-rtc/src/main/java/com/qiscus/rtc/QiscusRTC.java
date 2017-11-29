@@ -239,6 +239,7 @@ public class QiscusRTC {
         session = new QiscusRTCSession(applicationContext);
         appId = app_id;
         appSecret = app_secret;
+        appHost = "wss://rtc.qiscus.com/signal";
     }
 
     /**
@@ -248,6 +249,7 @@ public class QiscusRTC {
      * @param instance - Application instance
      * @param app_id - String app_id
      * @param app_secret - String app_secret
+     * @param host - String host
      */
     public static void init(Application instance, String app_id, String app_secret, String host) {
         appInstance = instance;
@@ -257,7 +259,7 @@ public class QiscusRTC {
         session = new QiscusRTCSession(applicationContext);
         appId = app_id;
         appSecret = app_secret;
-        appHost = "wss://rtc.qiscus.com/signal";
+        appHost = host;
     }
 
     /**
