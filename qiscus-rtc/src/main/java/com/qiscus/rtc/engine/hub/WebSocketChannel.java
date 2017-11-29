@@ -24,7 +24,6 @@ import de.tavendo.autobahn.WebSocketException;
 
 public class WebSocketChannel {
     private static final String TAG = WebSocketChannel.class.getSimpleName();
-    private static String SERVER = "wss://rtc.qiscus.com/signal";
 
     private final WebSocketChannelEvents events;
     private final Handler handler;
@@ -86,13 +85,13 @@ public class WebSocketChannel {
 
         closeEvent = false;
 
-        Log.d(TAG, "Connecting WebSocket to: " + SERVER );
+        Log.d(TAG, "Connecting WebSocket to: " + QiscusRTC.getHost() );
 
         ws = new WebSocketConnection();
         wsObserver = new WebSocketObserver();
 
         try {
-            ws.connect(new URI(SERVER), wsObserver);
+            ws.connect(new URI(QiscusRTC.getHost()), wsObserver);
         } catch (URISyntaxException e) {
             reportError("URI error: " + e.getMessage());
         } catch (WebSocketException e) {
@@ -545,7 +544,7 @@ public class WebSocketChannel {
     private class WebSocketObserver implements WebSocket.WebSocketConnectionObserver {
         @Override
         public void onOpen() {
-            Log.d(TAG, "WebSocket connection opened to: " + SERVER);
+            Log.d(TAG, "WebSocket connection opened to: " + QiscusRTC.getHost());
             handler.post(new Runnable() {
                 @Override
                 public void run() {
