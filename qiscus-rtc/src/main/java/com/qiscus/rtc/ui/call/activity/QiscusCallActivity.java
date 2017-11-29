@@ -305,7 +305,8 @@ public class QiscusCallActivity extends BaseActivity implements CallingFragment.
             QiscusRTC.Call.getCallConfig().getOnVideoClickListener().onClick(videoOn);
         }
 
-        rtcClient.setVideoEnabled(videoOn);
+        pipRenderer.setEnabled(videoOn);
+        rtcClient.setVideoPipEnabled(videoOn);
     }
 
     @Override

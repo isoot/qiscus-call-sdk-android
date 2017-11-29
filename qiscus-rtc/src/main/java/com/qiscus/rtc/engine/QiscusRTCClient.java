@@ -1,8 +1,14 @@
 package com.qiscus.rtc.engine;
 
 import android.content.Context;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
 import android.util.Log;
+import android.view.View;
 
+import com.qiscus.rtc.R;
 import com.qiscus.rtc.engine.hub.HubListener;
 import com.qiscus.rtc.engine.hub.HubSignal;
 import com.qiscus.rtc.engine.hub.WebSocketClient;
@@ -63,6 +69,11 @@ public class QiscusRTCClient implements HubSignal.SignalEvents, PCClient.PeerCon
     private QiscusRTCListener rtcListener;
     private boolean initiator;
     private boolean videoEnabled;
+
+    final int colorBlack = 0x00000000;
+    final int colorTransparant = 0xFF000000;
+    final Drawable black = new ColorDrawable(colorBlack);
+    final Drawable transparant = new ColorDrawable(colorTransparant);
 
     public QiscusRTCClient(Context context, SurfaceViewRenderer pipRenderer, SurfaceViewRenderer fullscreenRenderer, HubListener hubListener, QiscusRTCListener rtcListener) {
         this.context = context;
@@ -144,6 +155,13 @@ public class QiscusRTCClient implements HubSignal.SignalEvents, PCClient.PeerCon
     public void setVideoEnabled(boolean on) {
         if (pcClient != null) {
             pcClient.setVideoEnabled(on);
+        }
+    }
+
+    public void setVideoPipEnabled(boolean on) {
+        if (pcClient != null) {
+            pcClient.setVideoPipEnabled(on);
+            pipRenderer.setBackground(on ? black : transparant);
         }
     }
 
