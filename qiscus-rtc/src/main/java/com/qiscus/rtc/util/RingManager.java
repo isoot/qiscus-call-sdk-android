@@ -16,6 +16,7 @@ public class RingManager {
     private static RingManager ringManager;
     private AudioManager audioManager;
     private MediaPlayer phoneRingPlayer;
+    private MediaPlayer phoneHangupPlayer;
     private Context context;
     private Vibrator v;
 
@@ -35,7 +36,7 @@ public class RingManager {
 
 
     public synchronized void play(QiscusRTC.CallType callType, QiscusRTC.CallAs callAs) {
-        phoneRingPlayer = MediaPlayer.create(context, QiscusRTC.Call.getCallConfig().getRingingSound());
+        phoneRingPlayer = MediaPlayer.create(context, QiscusRTC.Call.getCallConfig().getHangupSound());
         if (callAs == QiscusRTC.CallAs.CALLER) {
             phoneRingPlayer = MediaPlayer.create(context, QiscusRTC.Call.getCallConfig().getWaitingSound());
         }
@@ -87,6 +88,22 @@ public class RingManager {
                     vibrate();
             }
         }
+    }
+
+    public synchronized void playHangup(QiscusRTC.CallType callType) {
+        phoneHangupPlayer = MediaPlayer.create(context, QiscusRTC.Call.getCallConfig().getRingingSound());
+
+        if (phoneHangupPlayer != null && !phoneHangupPlayer.isPlaying()) {
+            audioManager.setMode(AudioManager.MODE_IN_CALL);
+            audioManager.setSpeakerphoneOn(callType == QiscusRTC.CallType.VIDEO);
+            audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC,
+                    AudioManager.ADJUST_RAISE, 0);
+            phoneHangupPlayer.start();
+            phoneHangupPlayer.stop();
+            phoneHangupPlayer.release();
+        }
+
+        phoneHangupPlayer = null;
     }
 
     public void setSpeakerPhoneOn(boolean speakerOn) {

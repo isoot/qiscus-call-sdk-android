@@ -57,6 +57,7 @@ public class QiscusCallActivity extends BaseActivity implements CallingFragment.
     private CallFragment callFragment;
     private PowerManager powerManager;
     private PowerManager.WakeLock wakeLock;
+    private RingManager ringManager;
     private int field = 0x00000020;
 
     public static Intent generateIntent(Context context, QiscusRTCCall callData) {
@@ -86,7 +87,7 @@ public class QiscusCallActivity extends BaseActivity implements CallingFragment.
         } else {
             finish();
         }
-
+        ringManager = RingManager.getInstance(this);
     }
 
     private void autoDisconnect() {
@@ -429,6 +430,7 @@ public class QiscusCallActivity extends BaseActivity implements CallingFragment.
 
     private void disconnect() {
         NotificationManagerCompat.from(this).cancel(ON_GOING_NOTIF_ID);
+        ringManager.playHangup(callData.getCallType());
         releaseProximity();
 
         if (rtcClient != null) {
