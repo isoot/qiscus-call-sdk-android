@@ -36,7 +36,7 @@ public class RingManager {
 
 
     public synchronized void play(QiscusRTC.CallType callType, QiscusRTC.CallAs callAs) {
-        phoneRingPlayer = MediaPlayer.create(context, QiscusRTC.Call.getCallConfig().getHangupSound());
+        phoneRingPlayer = MediaPlayer.create(context, QiscusRTC.Call.getCallConfig().getRingingSound());
         if (callAs == QiscusRTC.CallAs.CALLER) {
             phoneRingPlayer = MediaPlayer.create(context, QiscusRTC.Call.getCallConfig().getWaitingSound());
         }
@@ -91,7 +91,7 @@ public class RingManager {
     }
 
     public synchronized void playHangup(QiscusRTC.CallType callType) {
-        phoneHangupPlayer = MediaPlayer.create(context, QiscusRTC.Call.getCallConfig().getRingingSound());
+        phoneHangupPlayer = MediaPlayer.create(context, QiscusRTC.Call.getCallConfig().getHangupSound());
 
         if (phoneHangupPlayer != null && !phoneHangupPlayer.isPlaying()) {
             audioManager.setMode(AudioManager.MODE_IN_CALL);
