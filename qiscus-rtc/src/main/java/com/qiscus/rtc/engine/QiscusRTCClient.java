@@ -3,15 +3,11 @@ package com.qiscus.rtc.engine;
 import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
-import android.support.annotation.RequiresApi;
 import android.util.Log;
-import android.view.View;
 
-import com.qiscus.rtc.R;
 import com.qiscus.rtc.engine.hub.HubListener;
 import com.qiscus.rtc.engine.hub.HubSignal;
-import com.qiscus.rtc.engine.hub.WebSocketClient;
+import com.qiscus.rtc.engine.hub.WebsocketClient;
 import com.qiscus.rtc.engine.peer.PCClient;
 import com.qiscus.rtc.engine.util.QiscusRTCListener;
 
@@ -100,7 +96,7 @@ public class QiscusRTCClient implements HubSignal.SignalEvents, PCClient.PeerCon
         this.videoEnabled = videoEnabled;
 
         HubSignal.SignalParameters parameters = new HubSignal.SignalParameters(clientId, roomId, initiator, videoEnabled, target);
-        hubSignal = new WebSocketClient(QiscusRTCClient.this, parameters);
+        hubSignal = new WebsocketClient(QiscusRTCClient.this, parameters);
         hubSignal.connect();
 
         VideoCapturer videoCapturer = null;

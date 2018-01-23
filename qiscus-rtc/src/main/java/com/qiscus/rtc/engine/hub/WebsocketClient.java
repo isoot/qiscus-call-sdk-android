@@ -14,14 +14,14 @@ import org.webrtc.SessionDescription;
  * Created by fitra on 22/11/17.
  */
 
-public class WebSocketClient implements HubSignal, WebSocketChannel.WebSocketChannelEvents {
-    private static final String TAG = WebSocketClient.class.getSimpleName();
+public class WebsocketClient implements HubSignal, WebsocketChannel.WebSocketChannelEvents {
+    private static final String TAG = WebsocketClient.class.getSimpleName();
 
     private final Handler handler;
     private final SignalParameters parameters;
 
     private SignalEvents events;
-    private WebSocketChannel wsChannel;
+    private WebsocketChannel wsChannel;
     private ConnectionState roomState;
     private boolean initiator;
 
@@ -33,7 +33,7 @@ public class WebSocketClient implements HubSignal, WebSocketChannel.WebSocketCha
         MESSAGE, LEAVE
     }
 
-    public WebSocketClient(SignalEvents events, SignalParameters parameters) {
+    public WebsocketClient(SignalEvents events, SignalParameters parameters) {
         this.events = events;
         this.parameters = parameters;
         this.initiator = parameters.initiator;
@@ -85,7 +85,7 @@ public class WebSocketClient implements HubSignal, WebSocketChannel.WebSocketCha
                     boolean success = data.getBoolean("success");
 
                     if (success) {
-                        wsChannel.setState(WebSocketChannel.WebSocketConnectionState.LOGGEDIN);
+                        wsChannel.setState(WebsocketChannel.WebSocketConnectionState.LOGGEDIN);
                         events.onLoggedinToRoom();
 
                         if (response.equals("room_join")) {
@@ -191,7 +191,7 @@ public class WebSocketClient implements HubSignal, WebSocketChannel.WebSocketCha
         handler.post(new Runnable() {
             @Override
             public void run() {
-                wsChannel = new WebSocketChannel(handler, WebSocketClient.this);
+                wsChannel = new WebsocketChannel(handler, WebsocketClient.this);
                 wsChannel.connect();
             }
         });

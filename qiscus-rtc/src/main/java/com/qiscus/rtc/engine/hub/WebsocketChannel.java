@@ -9,29 +9,25 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.webrtc.IceCandidate;
 import org.webrtc.SessionDescription;
+import tech.gusavila92.websocketclient.WebSocketClient;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.LinkedList;
 
-import de.tavendo.autobahn.WebSocket;
-import de.tavendo.autobahn.WebSocketConnection;
-import de.tavendo.autobahn.WebSocketException;
-
 /**
  * Created by fitra on 22/11/17.
  */
 
-public class WebSocketChannel {
-    private static final String TAG = WebSocketChannel.class.getSimpleName();
+public class WebsocketChannel {
+    private static final String TAG = WebsocketChannel.class.getSimpleName();
 
     private final WebSocketChannelEvents events;
     private final Handler handler;
     private final LinkedList<String> wsSendQueue;
     private final Object closeEventLock = new Object();
 
-    private WebSocketConnection ws;
-    private WebSocketObserver wsObserver;
+    private WebSocketClient ws;
     private WebSocketConnectionState state;
     private boolean closeEvent;
     private boolean pendingSendAccept;
@@ -50,7 +46,7 @@ public class WebSocketChannel {
         NEW, CONNECTED, REGISTERED, LOGGEDIN, CLOSED, ERROR
     }
 
-    public WebSocketChannel(Handler handler, WebSocketChannelEvents events) {
+    public WebsocketChannel(Handler handler, WebSocketChannelEvents events) {
         this.handler = handler;
         this.events = events;
         room_id = null;
@@ -85,18 +81,97 @@ public class WebSocketChannel {
 
         closeEvent = false;
 
-        Log.d(TAG, "Connecting WebSocket to: " + QiscusRTC.getHost() );
+        Log.d(TAG, "Connecting WebSocket to: " + QiscusRTC.getHost());
 
-        ws = new WebSocketConnection();
-        wsObserver = new WebSocketObserver();
+        URI uri;
 
         try {
-            ws.connect(new URI(QiscusRTC.getHost()), wsObserver);
+            uri = new URI(QiscusRTC.getHost());
         } catch (URISyntaxException e) {
             reportError("URI error: " + e.getMessage());
-        } catch (WebSocketException e) {
-            reportError("WebSocket connection error: " + e.getMessage());
+            return;
         }
+
+        ws = new WebSocketClient(uri) {
+            @Override
+            public void onOpen() {
+                Log.d(TAG, "WebSocket connection opened to: " + QiscusRTC.getHost());
+
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        state = WebSocketConnectionState.CONNECTED;
+                        events.onWebSocketOpen();
+
+                        // Check if we have pending register request.
+                        if (client_id != null) {
+                            register(client_id);
+                        }
+                    }
+                });
+            }
+
+            @Override
+            public void onTextReceived(String payload) {
+                Log.d(TAG, "WSS->C: " + payload);
+
+                final String message = payload;
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (state == WebSocketConnectionState.CONNECTED
+                                || state == WebSocketConnectionState.REGISTERED
+                                || state == WebSocketConnectionState.LOGGEDIN) {
+                            events.onWebSocketMessage(message);
+                        }
+                    }
+                });
+            }
+
+            @Override
+            public void onBinaryReceived(byte[] data) {
+                //
+            }
+
+            @Override
+            public void onPingReceived(byte[] data) {
+                //
+            }
+
+            @Override
+            public void onPongReceived(byte[] data) {
+                //
+            }
+
+            @Override
+            public void onException(Exception e) {
+                reportError("WebSocket connection error: " + e.getMessage());
+            }
+
+            @Override
+            public void onCloseReceived() {
+                Log.d(TAG, "WebSocket connection closed. State: " + state);
+
+                synchronized (closeEventLock) {
+                    closeEvent = true;
+                    closeEventLock.notify();
+                }
+
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (state != WebSocketConnectionState.CLOSED) {
+                            state = WebSocketConnectionState.CLOSED;
+                            events.onWebSocketClose();
+                        }
+                    }
+                });
+            }
+        };
+
+        ws.setConnectTimeout(10000);
+        ws.setReadTimeout(60000);
+        ws.connect();
     }
 
     public void register(final String client_id) {
@@ -122,11 +197,11 @@ public class WebSocketChannel {
 
             Log.d(TAG, "C->WSS: " + object.toString());
 
-            ws.sendTextMessage(object.toString());
+            ws.send(object.toString());
 
             // Send any previously accumulated messages.
             for (String sendMessage : wsSendQueue) {
-                send(sendMessage);
+                sendState(sendMessage);
             }
 
             wsSendQueue.clear();
@@ -156,7 +231,7 @@ public class WebSocketChannel {
 
             Log.d(TAG, "C->WSS: " + object.toString());
 
-            ws.sendTextMessage(object.toString());
+            ws.send(object.toString());
         } catch (JSONException e) {
             reportError("WebSocket create room error: " + e.getMessage());
         }
@@ -182,7 +257,7 @@ public class WebSocketChannel {
 
             Log.d(TAG, "C->WSS: " + object.toString());
 
-            ws.sendTextMessage(object.toString());
+            ws.send(object.toString());
         } catch (JSONException e) {
             reportError("WebSocket join room error: " + e.getMessage());
         }
@@ -207,7 +282,7 @@ public class WebSocketChannel {
 
             Log.d(TAG, "C->WSS: " + object.toString());
 
-            ws.sendTextMessage(object.toString());
+            ws.send(object.toString());
         } catch (JSONException e) {
             reportError("WebSocket sync call error: " + e.getMessage());
         }
@@ -232,7 +307,7 @@ public class WebSocketChannel {
 
             Log.d(TAG, "C->WSS: " + object.toString());
 
-            ws.sendTextMessage(object.toString());
+            ws.send(object.toString());
         } catch (JSONException e) {
             reportError("WebSocket ack call error: " + e.getMessage());
         }
@@ -259,7 +334,7 @@ public class WebSocketChannel {
 
                 Log.d(TAG, "C->WSS: " + object.toString());
 
-                ws.sendTextMessage(object.toString());
+                ws.send(object.toString());
             } catch (JSONException e) {
                 reportError("WebSocket accept call error: " + e.getMessage());
             }
@@ -285,7 +360,7 @@ public class WebSocketChannel {
 
             Log.d(TAG, "C->WSS: " + object.toString());
 
-            ws.sendTextMessage(object.toString());
+            ws.send(object.toString());
         } catch (JSONException e) {
             reportError("WebSocket reject call error: " + e.getMessage());
         }
@@ -310,7 +385,7 @@ public class WebSocketChannel {
 
             Log.d(TAG, "C->WSS: " + object.toString());
 
-            ws.sendTextMessage(object.toString());
+            ws.send(object.toString());
         } catch (JSONException e) {
             reportError("WebSocket cancel call error: " + e.getMessage());
         }
@@ -331,7 +406,7 @@ public class WebSocketChannel {
 
             Log.d(TAG, "C->WSS: " + object.toString());
 
-            ws.sendTextMessage(object.toString());
+            ws.send(object.toString());
         } catch (JSONException e) {
             reportError("WebSocket end call error: " + e.getMessage());
         }
@@ -355,7 +430,7 @@ public class WebSocketChannel {
 
             Log.d(TAG, "C->WSS: " + object.toString());
 
-            ws.sendTextMessage(object.toString());
+            ws.send(object.toString());
         } catch (JSONException e) {
             reportError("WebSocket notify connect error: " + e.getMessage());
         }
@@ -380,7 +455,7 @@ public class WebSocketChannel {
 
             Log.d(TAG, "C->WSS: " + object.toString());
 
-            ws.sendTextMessage(object.toString());
+            ws.send(object.toString());
         } catch (JSONException e) {
             reportError("WebSocket notify state error: " + e.getMessage());
         }
@@ -406,7 +481,7 @@ public class WebSocketChannel {
 
             Log.d(TAG, "C->WSS: " + object.toString());
 
-            ws.sendTextMessage(object.toString());
+            ws.send(object.toString());
         } catch (JSONException e) {
             reportError("WebSocket send offer error: " + e.getMessage());
         }
@@ -432,7 +507,7 @@ public class WebSocketChannel {
 
             Log.d(TAG, "C->WSS: " + object.toString());
 
-            ws.sendTextMessage(object.toString());
+            ws.send(object.toString());
         } catch (JSONException e) {
             reportError("WebSocket send answer error: " + e.getMessage());
         }
@@ -458,7 +533,7 @@ public class WebSocketChannel {
 
             Log.d(TAG, "C->WSS: " + object.toString());
 
-            ws.sendTextMessage(object.toString());
+            ws.send(object.toString());
         } catch (JSONException e) {
             Log.e(TAG, "WebSocket send candidate error: " + e.getMessage());
         }
@@ -477,7 +552,7 @@ public class WebSocketChannel {
 
                 Log.d(TAG, "C->WSS: " + object.toString());
 
-                ws.sendTextMessage(object.toString());
+                ws.send(object.toString());
             } catch (JSONException e) {
                 Log.e(TAG, "WebSocket unregister error: " + e.getMessage());
             }
@@ -487,7 +562,7 @@ public class WebSocketChannel {
 
         // Close WebSocket in CONNECTED or ERROR states only.
         if (state == WebSocketConnectionState.CONNECTED || state == WebSocketConnectionState.ERROR) {
-            ws.disconnect();
+            ws.close();
             state = WebSocketConnectionState.CLOSED;
 
             if (waitForComplete) {
@@ -507,7 +582,7 @@ public class WebSocketChannel {
         Log.d(TAG, "Disconnecting WebSocket done");
     }
 
-    public void send(String message) {
+    public void sendState(String message) {
         checkIfCalledOnValidThread();
 
         switch (state) {
@@ -532,76 +607,13 @@ public class WebSocketChannel {
 
                     Log.d(TAG, "C->WSS: " + message);
 
-                    ws.sendTextMessage(message);
+                    ws.send(message);
                 } catch (JSONException e) {
                     Log.e(TAG, "WebSocket send error: " + e.getMessage());
                 }
 
                 break;
         }
-    }
-
-    private class WebSocketObserver implements WebSocket.WebSocketConnectionObserver {
-        @Override
-        public void onOpen() {
-            Log.d(TAG, "WebSocket connection opened to: " + QiscusRTC.getHost());
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    state = WebSocketConnectionState.CONNECTED;
-                    events.onWebSocketOpen();
-
-                    // Check if we have pending register request.
-                    if (client_id != null) {
-                        register(client_id);
-                    }
-                }
-            });
-        }
-
-        @Override
-        public void onClose(WebSocketCloseNotification code, String reason) {
-            Log.d(TAG, "WebSocket connection closed. Code: " + code + ". Reason: " + reason + ". State: "
-                    + state);
-
-            synchronized (closeEventLock) {
-                closeEvent = true;
-                closeEventLock.notify();
-            }
-
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    if (state != WebSocketConnectionState.CLOSED) {
-                        state = WebSocketConnectionState.CLOSED;
-                        events.onWebSocketClose();
-                    }
-                }
-            });
-        }
-
-        @Override
-        public void onTextMessage(String payload) {
-            Log.d(TAG, "WSS->C: " + payload);
-
-            final String message = payload;
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    if (state == WebSocketConnectionState.CONNECTED
-                            || state == WebSocketConnectionState.REGISTERED
-                            || state == WebSocketConnectionState.LOGGEDIN) {
-                        events.onWebSocketMessage(message);
-                    }
-                }
-            });
-        }
-
-        @Override
-        public void onRawTextMessage(byte[] payload) {}
-
-        @Override
-        public void onBinaryMessage(byte[] payload) {}
     }
 
     private void checkIfCalledOnValidThread() {
