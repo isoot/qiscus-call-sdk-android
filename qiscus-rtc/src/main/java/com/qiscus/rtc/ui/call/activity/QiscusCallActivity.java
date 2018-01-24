@@ -317,6 +317,12 @@ public class QiscusCallActivity extends BaseActivity implements CallingFragment.
         }
 
         rtcClient.switchCamera();
+
+        if (frontCamera) {
+            pipRenderer.setMirror(false);
+        } else {
+            pipRenderer.setMirror(true);
+        }
     }
 
     @Override
