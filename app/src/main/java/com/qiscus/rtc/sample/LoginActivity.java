@@ -28,7 +28,7 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (!txtUsername.getText().toString().isEmpty()) {
                     QiscusRTC.register(txtUsername.getText().toString(), txtUsername.getText().toString(), "http://dk6kcyuwrpkrj.cloudfront.net/wp-content/uploads/sites/45/2014/05/avatar-blank.jpg");
-                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                    Intent intent = new Intent(LoginActivity.this, SimpleCallActivity.class);
                     startActivity(intent);
                     finish();
                 } else {
