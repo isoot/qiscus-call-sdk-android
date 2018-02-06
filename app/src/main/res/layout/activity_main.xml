@@ -5,28 +5,17 @@
     android:layout_height="match_parent"
     android:padding="25dp"
     android:orientation="vertical"
+    android:gravity="center"
     tools:context="com.qiscus.rtc.sample.MainActivity">
 
-    <EditText
-        android:id="@+id/target_username"
-        android:hint="Call Target"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <EditText
-        android:id="@+id/room_id"
-        android:hint="Call Room"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
     <Button
-        android:id="@+id/btn_voice_call"
-        android:text="Start Voice Call"
+        android:id="@+id/btn_simple"
+        android:text="Simple Call Application"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
     <Button
-        android:id="@+id/btn_video_call"
-        android:text="Start Video Call"
+        android:id="@+id/btn_chat_integration"
+        android:text="Chat SDK Integration"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 </LinearLayout>

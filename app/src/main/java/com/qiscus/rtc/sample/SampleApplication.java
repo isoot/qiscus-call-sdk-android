@@ -12,6 +12,7 @@ public class SampleApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        Qiscus.init(this, "sdksample");
         QiscusRTC.init(this, "sample-application-C2", "KpPiqKGpoN");
     }
 }
