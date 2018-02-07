@@ -34,11 +34,11 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".SimpleCallActivity"
+            android:name=".simple.CallActivity"
             android:label="@string/title_activity_simple_call"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".ChatActivity"
+            android:name=".integration.ChatActivity"
             android:label="@string/title_activity_chat"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
