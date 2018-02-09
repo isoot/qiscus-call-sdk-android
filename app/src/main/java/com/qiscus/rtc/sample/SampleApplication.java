@@ -51,7 +51,6 @@ public class SampleApplication extends Application {
     private void handleCallPn(QiscusComment remoteMessage) {
         JSONObject json;
         try {
-            Log.d("SINI", remoteMessage.getExtraPayload());
             json = new JSONObject(remoteMessage.getExtraPayload());
             JSONObject payload = json.getJSONObject("payload");
 
