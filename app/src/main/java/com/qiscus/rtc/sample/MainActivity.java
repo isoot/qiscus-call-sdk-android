@@ -10,7 +10,7 @@ import android.view.View;
 import android.widget.Button;
 
 import com.qiscus.rtc.sample.integration.ChatActivity;
-import com.qiscus.rtc.sample.simple.CallActivity;
+import com.qiscus.rtc.sample.simple.LoginActivity;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
         simple.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, CallActivity.class);
+                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                 startActivity(intent);
             }
         });
