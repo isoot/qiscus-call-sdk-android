@@ -133,6 +133,11 @@ public class QiscusCallActivity extends BaseActivity implements CallingFragment.
     }
 
     @Override
+    public void onBackPressed() {
+        // do nothing
+    }
+
+    @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
         if (!hasFocus) {
