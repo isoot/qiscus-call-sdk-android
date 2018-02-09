@@ -441,7 +441,6 @@ public class QiscusCallActivity extends BaseActivity implements CallingFragment.
 
     private void disconnect() {
         NotificationManagerCompat.from(this).cancel(ON_GOING_NOTIF_ID);
-        ringManager.playHangup(callData.getCallType());
         releaseProximity();
 
         if (rtcClient != null) {
@@ -454,6 +453,7 @@ public class QiscusCallActivity extends BaseActivity implements CallingFragment.
                 fullscreenRenderer.release();
                 fullscreenRenderer = null;
                 RingManager.getInstance(this).stop();
+                ringManager.playHangup(callData.getCallType());
             } catch (Exception e) {
                 e.printStackTrace();
             }
