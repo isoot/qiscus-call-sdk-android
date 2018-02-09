@@ -442,6 +442,7 @@ public class QiscusCallActivity extends BaseActivity implements CallingFragment.
         if (rtcClient != null) {
             try {
                 rtcClient.end();
+                rtcClient.end();
                 rtcClient = null;
                 pipRenderer.release();
                 pipRenderer = null;
