@@ -2,15 +2,18 @@ package com.qiscus.rtc.ui.call.activity;
 
 import android.Manifest;
 import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
-import android.support.v7.app.NotificationCompat;
 import android.view.View;
 import android.widget.FrameLayout;
 
@@ -18,7 +21,6 @@ import com.qiscus.rtc.QiscusRTC;
 import com.qiscus.rtc.R;
 import com.qiscus.rtc.data.model.QiscusRTCCall;
 import com.qiscus.rtc.engine.QiscusRTCClient;
-import com.qiscus.rtc.engine.QiscusRTCViewRenderer;
 import com.qiscus.rtc.engine.hub.HubListener;
 import com.qiscus.rtc.engine.util.QiscusRTCListener;
 import com.qiscus.rtc.ui.base.BaseActivity;
@@ -465,10 +467,21 @@ public class QiscusCallActivity extends BaseActivity implements CallingFragment.
     }
 
     private void showOnGoingCallNotification() {
+        String notificationChannelId = getApplication().getPackageName() + ".qiscus.rtc.notification.channel";
+        if (Build.VERSION.SDK_INT >= 26) {
+            NotificationChannel notificationChannel =
+                    new NotificationChannel(notificationChannelId, "Call", NotificationManager.IMPORTANCE_HIGH);
+            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            if (notificationManager != null) {
+                notificationManager.createNotificationChannel(notificationChannel);
+            }
+        }
+
         PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0,
                 new Intent(this, QiscusCallActivity.class),
                 PendingIntent.FLAG_UPDATE_CURRENT);
-        Notification notification = new NotificationCompat.Builder(getApplicationContext())
+
+        Notification notification = new NotificationCompat.Builder(getApplicationContext(), notificationChannelId)
                 .setContentTitle(getString(R.string.on_going_call_notif))
                 .setContentText(getString(R.string.on_going_call_notif))
                 .setSmallIcon(QiscusRTC.Call.getCallConfig().getSmallOngoingNotifIcon())
