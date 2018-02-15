@@ -1,6 +1,7 @@
 package com.qiscus.rtc.sample;
 
 import android.app.Application;
+import android.os.Handler;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
@@ -58,27 +59,33 @@ public class SampleApplication extends Application {
                 String event = payload.getString("call_event");
                 switch (event.toLowerCase()) {
                     case "incoming":
-                        Boolean isVideo = (Boolean) payload.get("call_is_video");
-                        String roomId = payload.get("call_room_id").toString();
+                        final Boolean isVideo = (Boolean) payload.get("call_is_video");
+                        final String roomId = payload.get("call_room_id").toString();
 
                         JSONObject caller = payload.getJSONObject("call_caller");
-                        String caller_email = caller.getString("username");
-                        String caller_name = caller.getString("name");
-                        String caller_avatar = caller.getString("avatar");
+                        final String caller_email = caller.getString("username");
+                        final String caller_name = caller.getString("name");
+                        final String caller_avatar = caller.getString("avatar");
                         JSONObject callee = payload.getJSONObject("call_callee");
-                        String callee_email = callee.getString("username");
-                        String callee_name = callee.getString("name");
-                        String callee_avatar = callee.getString("avatar");
+                        final String callee_email = callee.getString("username");
+                        final String callee_name = callee.getString("name");
+                        final String callee_avatar = callee.getString("avatar");
 
                         if (Qiscus.getQiscusAccount().getEmail().equals(callee_email)) {
-                            QiscusRTC.buildCallWith(roomId)
-                                    .setCallAs(QiscusRTC.CallAs.CALLEE)
-                                    .setCallType(isVideo == true ? QiscusRTC.CallType.VIDEO : QiscusRTC.CallType.VOICE)
-                                    .setCalleeUsername(callee_email)
-                                    .setCallerUsername(caller_email)
-                                    .setCallerDisplayName(caller_name)
-                                    .setCallerDisplayAvatar(caller_avatar)
-                                    .show(this);
+                            Handler handler = new Handler();
+                            handler.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    QiscusRTC.buildCallWith(roomId)
+                                            .setCallAs(QiscusRTC.CallAs.CALLEE)
+                                            .setCallType(isVideo == true ? QiscusRTC.CallType.VIDEO : QiscusRTC.CallType.VOICE)
+                                            .setCalleeUsername(callee_email)
+                                            .setCallerUsername(caller_email)
+                                            .setCallerDisplayName(caller_name)
+                                            .setCallerDisplayAvatar(caller_avatar)
+                                            .show(getApplicationContext());
+                                }
+                            }, 2500);
                         }
                         break;
                     default:
