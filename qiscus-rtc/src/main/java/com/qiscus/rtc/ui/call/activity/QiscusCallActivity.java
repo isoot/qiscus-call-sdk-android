@@ -12,6 +12,9 @@ import android.os.PowerManager;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v7.app.NotificationCompat;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 
 import com.qiscus.rtc.QiscusRTC;
@@ -24,6 +27,7 @@ import com.qiscus.rtc.engine.util.QiscusRTCListener;
 import com.qiscus.rtc.ui.base.BaseActivity;
 import com.qiscus.rtc.ui.base.CallFragment;
 import com.qiscus.rtc.ui.base.CallingFragment;
+import com.qiscus.rtc.util.DimUtils;
 import com.qiscus.rtc.util.RingManager;
 
 import org.greenrobot.eventbus.EventBus;
@@ -332,11 +336,19 @@ public class QiscusCallActivity extends BaseActivity implements CallingFragment.
 
     @Override
     public void onPanelSlide(boolean hidden) {
+        pipRenderer.setVisibility(View.VISIBLE);
         if (hidden) {
-            pipRenderer.setVisibility(View.INVISIBLE);
+            int bottom = Math.round((DimUtils.convertDpToPixel(12, this)));
+            setMargins(pipRenderer, 0, 0, 12, bottom);
         } else {
-            pipRenderer.setVisibility(View.VISIBLE);
+            int bottom = Math.round((DimUtils.convertDpToPixel(140, this)));
+            setMargins(pipRenderer, 0, 0, 12, bottom);
         }
+    }
+
+    @Override
+    public void hidePanelSlide() {
+        pipRenderer.setVisibility(View.GONE);
     }
 
     @Override
@@ -481,5 +493,13 @@ public class QiscusCallActivity extends BaseActivity implements CallingFragment.
         NotificationManagerCompat
                 .from(this)
                 .notify(ON_GOING_NOTIF_ID, notification);
+    }
+
+    private void setMargins (View view, int left, int top, int right, int bottom) {
+        if (view.getLayoutParams() instanceof ViewGroup.MarginLayoutParams) {
+            ViewGroup.MarginLayoutParams p = (ViewGroup.MarginLayoutParams) view.getLayoutParams();
+            p.setMargins(left, top, right, bottom);
+            view.requestLayout();
+        }
     }
 }

@@ -181,12 +181,13 @@ public abstract class CallFragment extends Fragment {
         slideDownAnim.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
-                onCallListener.onPanelSlide(true);
+                onCallListener.hidePanelSlide();
             }
 
             @Override
             public void onAnimationEnd(Animation animation) {
                 viewGroup.setVisibility(View.GONE);
+                onCallListener.onPanelSlide(true);
             }
 
             @Override
@@ -203,6 +204,7 @@ public abstract class CallFragment extends Fragment {
             @Override
             public void onAnimationStart(Animation animation) {
                 viewGroup.setVisibility(View.VISIBLE);
+                onCallListener.hidePanelSlide();
             }
 
             @Override
@@ -244,5 +246,6 @@ public abstract class CallFragment extends Fragment {
         void onCameraSwitch(boolean frontCamera);
         void onPanelSlide(boolean hidden);
         void onEndCall(long callDurationMillis);
+        void hidePanelSlide();
     }
 }
