@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.Button;
 
 import com.qiscus.rtc.sample.integration.ChatActivity;
+import com.qiscus.rtc.sample.integration.ContactActivity;
 import com.qiscus.rtc.sample.simple.LoginActivity;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.model.QiscusAccount;
@@ -63,31 +64,7 @@ public class MainActivity extends AppCompatActivity {
                                         Log.i(TAG, "Login chat with account: " + qiscusAccount);
                                         alertDialog.cancel();
 
-                                        Qiscus.buildChatRoomWith("user2_sample_call@example.com")
-                                                .build(new Qiscus.ChatBuilderListener() {
-                                                    @Override
-                                                    public void onSuccess(QiscusChatRoom qiscusChatRoom) {
-                                                        startActivity(ChatActivity.generateIntent(MainActivity.this, qiscusChatRoom));
-                                                    }
-
-                                                    @Override
-                                                    public void onError(Throwable throwable) {
-                                                        if (throwable instanceof HttpException) {
-                                                            HttpException e = (HttpException) throwable;
-
-                                                            try {
-                                                                String errorMessage = e.response().errorBody().string();
-                                                                Log.e(TAG, errorMessage);
-                                                            } catch (IOException e1) {
-                                                                e1.printStackTrace();
-                                                            }
-                                                        } else if (throwable instanceof IOException) {
-                                                            Log.e(TAG, "Can not connect to qiscus server.");
-                                                        } else {
-                                                            Log.e(TAG, "Unexpected error.");
-                                                        }
-                                                    }
-                                                });
+                                        startActivity(new Intent(MainActivity.this, ContactActivity.class));
                                     }
 
                                     @Override
@@ -110,7 +87,6 @@ public class MainActivity extends AppCompatActivity {
                                 });
                     }
                 });
-
                 dialog.findViewById(R.id.login_user2).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -122,31 +98,75 @@ public class MainActivity extends AppCompatActivity {
                                         Log.i(TAG, "Login chat with account: " + qiscusAccount);
                                         alertDialog.cancel();
 
-                                        Qiscus.buildChatRoomWith("user1_sample_call@example.com")
-                                                .build(new Qiscus.ChatBuilderListener() {
-                                                    @Override
-                                                    public void onSuccess(QiscusChatRoom qiscusChatRoom) {
-                                                        startActivity(ChatActivity.generateIntent(MainActivity.this, qiscusChatRoom));
-                                                    }
+                                        startActivity(new Intent(MainActivity.this, ContactActivity.class));
+                                    }
 
-                                                    @Override
-                                                    public void onError(Throwable throwable) {
-                                                        if (throwable instanceof HttpException) {
-                                                            HttpException e = (HttpException) throwable;
+                                    @Override
+                                    public void onError(Throwable throwable) {
+                                        if (throwable instanceof HttpException) {
+                                            HttpException e = (HttpException) throwable;
 
-                                                            try {
-                                                                String errorMessage = e.response().errorBody().string();
-                                                                Log.e(TAG, errorMessage);
-                                                            } catch (IOException e1) {
-                                                                e1.printStackTrace();
-                                                            }
-                                                        } else if (throwable instanceof IOException) {
-                                                            Log.e(TAG, "Can not connect to qiscus server.");
-                                                        } else {
-                                                            Log.e(TAG, "Unexpected error.");
-                                                        }
-                                                    }
-                                                });
+                                            try {
+                                                String errorMessage = e.response().errorBody().string();
+                                                Log.e(TAG, errorMessage);
+                                            } catch (IOException er) {
+                                                er.printStackTrace();
+                                            }
+                                        } else if (throwable instanceof IOException) {
+                                            Log.e(TAG, "Can not connect to qiscus server.");
+                                        } else {
+                                            Log.e(TAG, "Unexpected error.");
+                                        }
+                                    }
+                                });
+                    }
+                });
+                dialog.findViewById(R.id.login_user4).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Qiscus.setUser("user4_sample_call@example.com", "123")
+                                .withUsername("User 4 Sample Call")
+                                .save(new Qiscus.SetUserListener() {
+                                    @Override
+                                    public void onSuccess(QiscusAccount qiscusAccount) {
+                                        Log.i(TAG, "Login chat with account: " + qiscusAccount);
+                                        alertDialog.cancel();
+
+                                        startActivity(new Intent(MainActivity.this, ContactActivity.class));
+                                    }
+
+                                    @Override
+                                    public void onError(Throwable throwable) {
+                                        if (throwable instanceof HttpException) {
+                                            HttpException e = (HttpException) throwable;
+
+                                            try {
+                                                String errorMessage = e.response().errorBody().string();
+                                                Log.e(TAG, errorMessage);
+                                            } catch (IOException er) {
+                                                er.printStackTrace();
+                                            }
+                                        } else if (throwable instanceof IOException) {
+                                            Log.e(TAG, "Can not connect to qiscus server.");
+                                        } else {
+                                            Log.e(TAG, "Unexpected error.");
+                                        }
+                                    }
+                                });
+                    }
+                });
+                dialog.findViewById(R.id.login_user5).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Qiscus.setUser("user5_sample_call@example.com", "123")
+                                .withUsername("User 5 Sample Call")
+                                .save(new Qiscus.SetUserListener() {
+                                    @Override
+                                    public void onSuccess(QiscusAccount qiscusAccount) {
+                                        Log.i(TAG, "Login chat with account: " + qiscusAccount);
+                                        alertDialog.cancel();
+
+                                        startActivity(new Intent(MainActivity.this, ContactActivity.class));
                                     }
 
                                     @Override
