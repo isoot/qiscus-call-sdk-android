@@ -2,28 +2,34 @@ package com.qiscus.rtc.ui.call.activity;
 
 import android.Manifest;
 import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
-import android.support.v7.app.NotificationCompat;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 
 import com.qiscus.rtc.QiscusRTC;
 import com.qiscus.rtc.R;
 import com.qiscus.rtc.data.model.QiscusRTCCall;
 import com.qiscus.rtc.engine.QiscusRTCClient;
-import com.qiscus.rtc.engine.QiscusRTCViewRenderer;
 import com.qiscus.rtc.engine.hub.HubListener;
 import com.qiscus.rtc.engine.util.QiscusRTCListener;
 import com.qiscus.rtc.ui.base.BaseActivity;
 import com.qiscus.rtc.ui.base.CallFragment;
 import com.qiscus.rtc.ui.base.CallingFragment;
+import com.qiscus.rtc.util.DimUtils;
 import com.qiscus.rtc.util.RingManager;
 
 import org.greenrobot.eventbus.EventBus;
@@ -332,11 +338,19 @@ public class QiscusCallActivity extends BaseActivity implements CallingFragment.
 
     @Override
     public void onPanelSlide(boolean hidden) {
+        pipRenderer.setVisibility(View.VISIBLE);
         if (hidden) {
-            pipRenderer.setVisibility(View.INVISIBLE);
+            int bottom = Math.round((DimUtils.convertDpToPixel(12, this)));
+            setMargins(pipRenderer, 0, 0, 12, bottom);
         } else {
-            pipRenderer.setVisibility(View.VISIBLE);
+            int bottom = Math.round((DimUtils.convertDpToPixel(140, this)));
+            setMargins(pipRenderer, 0, 0, 12, bottom);
         }
+    }
+
+    @Override
+    public void hidePanelSlide() {
+        pipRenderer.setVisibility(View.GONE);
     }
 
     @Override
@@ -465,10 +479,21 @@ public class QiscusCallActivity extends BaseActivity implements CallingFragment.
     }
 
     private void showOnGoingCallNotification() {
+        String notificationChannelId = getApplication().getPackageName() + ".qiscus.rtc.notification.channel";
+        if (Build.VERSION.SDK_INT >= 26) {
+            NotificationChannel notificationChannel =
+                    new NotificationChannel(notificationChannelId, "Call", NotificationManager.IMPORTANCE_HIGH);
+            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            if (notificationManager != null) {
+                notificationManager.createNotificationChannel(notificationChannel);
+            }
+        }
+
         PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0,
                 new Intent(this, QiscusCallActivity.class),
                 PendingIntent.FLAG_UPDATE_CURRENT);
-        Notification notification = new NotificationCompat.Builder(getApplicationContext())
+
+        Notification notification = new NotificationCompat.Builder(getApplicationContext(), notificationChannelId)
                 .setContentTitle(getString(R.string.on_going_call_notif))
                 .setContentText(getString(R.string.on_going_call_notif))
                 .setSmallIcon(QiscusRTC.Call.getCallConfig().getSmallOngoingNotifIcon())
@@ -481,5 +506,13 @@ public class QiscusCallActivity extends BaseActivity implements CallingFragment.
         NotificationManagerCompat
                 .from(this)
                 .notify(ON_GOING_NOTIF_ID, notification);
+    }
+
+    private void setMargins (View view, int left, int top, int right, int bottom) {
+        if (view.getLayoutParams() instanceof ViewGroup.MarginLayoutParams) {
+            ViewGroup.MarginLayoutParams p = (ViewGroup.MarginLayoutParams) view.getLayoutParams();
+            p.setMargins(left, top, right, bottom);
+            view.requestLayout();
+        }
     }
 }
