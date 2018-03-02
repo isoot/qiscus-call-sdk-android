@@ -65,6 +65,8 @@ public class WebSocketClient implements HubSignal, WebSocketChannel.WebSocketCha
                     final String token = data.getString("token");
 
                     if (success) {
+                        wsChannel.setState(WebSocketChannel.WebSocketConnectionState.REGISTERED);
+
                         if (parameters.initiator) {
                             wsChannel.createRoom(parameters.roomId, token);
                         } else {

@@ -138,7 +138,7 @@ public class WebSocketChannel {
     public void createRoom(String roomId, String token) {
         checkIfCalledOnValidThread();
 
-        if (state != WebSocketConnectionState.CONNECTED) {
+        if (state != WebSocketConnectionState.REGISTERED) {
             Log.e(TAG, "WebSocket create room in state " + state);
             return;
         }
@@ -165,7 +165,7 @@ public class WebSocketChannel {
     public void joinRoom(String roomId, String token) {
         checkIfCalledOnValidThread();
 
-        if (state != WebSocketConnectionState.CONNECTED) {
+        if (state != WebSocketConnectionState.REGISTERED) {
             Log.e(TAG, "WebSocket join room in state " + state);
             return;
         }
@@ -550,11 +550,6 @@ public class WebSocketChannel {
                 public void run() {
                     state = WebSocketConnectionState.CONNECTED;
                     events.onWebSocketOpen();
-
-                    // Check if we have pending register request.
-                    if (client_id != null) {
-                        register(client_id);
-                    }
                 }
             });
         }
