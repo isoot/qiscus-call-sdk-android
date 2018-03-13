@@ -1,0 +1,27 @@
+[
+  {
+    "id": "user1_sample_call@example.com",
+    "name": "User 1 Sample Call",
+    "avatar_url": "https://robohash.org/helena.onnophris/bgset_bg2/3.14160?set=set4"
+  },
+  {
+    "id": "user2_sample_call@example.com",
+    "name": "User 2 Sample Call",
+    "avatar_url": "https://robohash.org/helena.onnophris/bgset_bg2/3.14160?set=set4"
+  },
+  {
+    "id": "user3_sample_call@example.com",
+    "name": "User 3 Sample Call",
+    "avatar_url": "https://robohash.org/euanthe.mneme/bgset_bg2/3.14160?set=set4"
+  },
+  {
+    "id": "user4_sample_call@example.com",
+    "name": "User 4 Sample Call",
+    "avatar_url": "https://robohash.org/dushyanta.izrail/bgset_bg2/3.14160?set=set4"
+  },
+  {
+    "id": "user5_sample_call@example.com",
+    "name": "User 5 Sample Call",
+    "avatar_url": "https://robohash.org/conchobhar.phaedra/bgset_bg2/3.14160?set=set4"
+  }
+]

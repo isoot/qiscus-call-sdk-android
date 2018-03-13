@@ -1,5 +1,6 @@
 package data;
 
+import com.qiscus.rtc.sample.model.User;
 import com.qiscus.rtc.sample.utils.Action;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
@@ -33,6 +34,22 @@ public class ChatRoomRepositoryImpl implements ChatRoomRepository {
                 .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom))
                 .filter(chatRoom -> chatRoom.getLastComment().getId() != 0)
                 .toList()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(onSuccess::call, onError::call);
+    }
+
+    @Override
+    public void createChatRoom(User user, Action<QiscusChatRoom> onSuccess, Action<Throwable> onError) {
+        QiscusChatRoom savedChatRoom = Qiscus.getDataStore().getChatRoom(user.getId());
+        if (savedChatRoom != null) {
+            onSuccess.call(savedChatRoom);
+            return;
+        }
+
+        QiscusApi.getInstance()
+                .getChatRoom(user.getId(), null, null)
+                .doOnNext(chatRoom -> Qiscus.getDataStore().addOrUpdate(chatRoom))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(onSuccess::call, onError::call);

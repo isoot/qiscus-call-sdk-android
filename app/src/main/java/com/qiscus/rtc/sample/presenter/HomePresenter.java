@@ -24,6 +24,10 @@ public class HomePresenter {
                 throwable -> view.showErrorMessage(throwable.getMessage()));
     }
 
+    public void createChatRoom() {
+        view.showContactPage();
+    }
+
     public void openChatRoom(QiscusChatRoom chatRoom) {
         view.showChatRoomPage(chatRoom);
     }
@@ -32,6 +36,8 @@ public class HomePresenter {
         void showChatRooms(List<QiscusChatRoom> chatRooms);
 
         void showChatRoomPage(QiscusChatRoom chatRoom);
+
+        void showContactPage();
 
         void showErrorMessage(String errorMessage);
     }
