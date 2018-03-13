@@ -51,155 +51,160 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
         integration.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                LayoutInflater inflater = LayoutInflater.from(MainActivity.this);
-                final View dialog = inflater.inflate(R.layout.dialog_login, null);
+                if (Qiscus.hasSetupUser()) {
+                    startActivity(new Intent(MainActivity.this, ContactActivity.class));
+                } else {
+                    LayoutInflater inflater = LayoutInflater.from(MainActivity.this);
+                    final View dialog = inflater.inflate(R.layout.dialog_login, null);
 
-                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
-                alertDialogBuilder.setView(dialog);
-                alertDialogBuilder.setCancelable(false);
+                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
+                    alertDialogBuilder.setView(dialog);
+                    alertDialogBuilder.setCancelable(false);
 
-                final AlertDialog alertDialog = alertDialogBuilder.create();
-                alertDialog.show();
+                    final AlertDialog alertDialog = alertDialogBuilder.create();
+                    alertDialog.show();
 
-                dialog.findViewById(R.id.login_user1).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Qiscus.setUser("user1_sample_call@example.com", "123")
-                                .withUsername("User 1 Sample Call")
-                                .save(new Qiscus.SetUserListener() {
-                                    @Override
-                                    public void onSuccess(QiscusAccount qiscusAccount) {
-                                        Log.i(TAG, "Login chat with account: " + qiscusAccount);
-                                        alertDialog.cancel();
+                    dialog.findViewById(R.id.login_user1).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Qiscus.setUser("user1_sample_call@example.com", "123")
+                                    .withUsername("User 1 Sample Call")
+                                    .save(new Qiscus.SetUserListener() {
+                                        @Override
+                                        public void onSuccess(QiscusAccount qiscusAccount) {
+                                            Log.i(TAG, "Login chat with account: " + qiscusAccount);
+                                            alertDialog.cancel();
 
-                                        startActivity(new Intent(MainActivity.this, ContactActivity.class));
-                                    }
-
-                                    @Override
-                                    public void onError(Throwable throwable) {
-                                        if (throwable instanceof HttpException) {
-                                            HttpException e = (HttpException) throwable;
-
-                                            try {
-                                                String errorMessage = e.response().errorBody().string();
-                                                Log.e(TAG, errorMessage);
-                                            } catch (IOException er) {
-                                                er.printStackTrace();
-                                            }
-                                        } else if (throwable instanceof IOException) {
-                                            Log.e(TAG, "Can not connect to qiscus server.");
-                                        } else {
-                                            Log.e(TAG, "Unexpected error.");
+                                            startActivity(new Intent(MainActivity.this, ContactActivity.class));
                                         }
-                                    }
-                                });
-                    }
-                });
-                dialog.findViewById(R.id.login_user2).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Qiscus.setUser("user2_sample_call@example.com", "123")
-                                .withUsername("User 2 Sample Call")
-                                .save(new Qiscus.SetUserListener() {
-                                    @Override
-                                    public void onSuccess(QiscusAccount qiscusAccount) {
-                                        Log.i(TAG, "Login chat with account: " + qiscusAccount);
-                                        alertDialog.cancel();
 
-                                        startActivity(new Intent(MainActivity.this, ContactActivity.class));
-                                    }
+                                        @Override
+                                        public void onError(Throwable throwable) {
+                                            if (throwable instanceof HttpException) {
+                                                HttpException e = (HttpException) throwable;
 
-                                    @Override
-                                    public void onError(Throwable throwable) {
-                                        if (throwable instanceof HttpException) {
-                                            HttpException e = (HttpException) throwable;
-
-                                            try {
-                                                String errorMessage = e.response().errorBody().string();
-                                                Log.e(TAG, errorMessage);
-                                            } catch (IOException er) {
-                                                er.printStackTrace();
+                                                try {
+                                                    String errorMessage = e.response().errorBody().string();
+                                                    Log.e(TAG, errorMessage);
+                                                } catch (IOException er) {
+                                                    er.printStackTrace();
+                                                }
+                                            } else if (throwable instanceof IOException) {
+                                                Log.e(TAG, "Can not connect to qiscus server.");
+                                            } else {
+                                                Log.e(TAG, "Unexpected error.");
                                             }
-                                        } else if (throwable instanceof IOException) {
-                                            Log.e(TAG, "Can not connect to qiscus server.");
-                                        } else {
-                                            Log.e(TAG, "Unexpected error.");
                                         }
-                                    }
-                                });
-                    }
-                });
-                dialog.findViewById(R.id.login_user4).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Qiscus.setUser("user4_sample_call@example.com", "123")
-                                .withUsername("User 4 Sample Call")
-                                .save(new Qiscus.SetUserListener() {
-                                    @Override
-                                    public void onSuccess(QiscusAccount qiscusAccount) {
-                                        Log.i(TAG, "Login chat with account: " + qiscusAccount);
-                                        alertDialog.cancel();
+                                    });
+                        }
+                    });
+                    dialog.findViewById(R.id.login_user2).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Qiscus.setUser("user2_sample_call@example.com", "123")
+                                    .withUsername("User 2 Sample Call")
+                                    .save(new Qiscus.SetUserListener() {
+                                        @Override
+                                        public void onSuccess(QiscusAccount qiscusAccount) {
+                                            Log.i(TAG, "Login chat with account: " + qiscusAccount);
+                                            alertDialog.cancel();
 
-                                        startActivity(new Intent(MainActivity.this, ContactActivity.class));
-                                    }
+                                            startActivity(new Intent(MainActivity.this, ContactActivity.class));
+                                        }
 
-                                    @Override
-                                    public void onError(Throwable throwable) {
-                                        if (throwable instanceof HttpException) {
-                                            HttpException e = (HttpException) throwable;
+                                        @Override
+                                        public void onError(Throwable throwable) {
+                                            if (throwable instanceof HttpException) {
+                                                HttpException e = (HttpException) throwable;
 
-                                            try {
-                                                String errorMessage = e.response().errorBody().string();
-                                                Log.e(TAG, errorMessage);
-                                            } catch (IOException er) {
-                                                er.printStackTrace();
+                                                try {
+                                                    String errorMessage = e.response().errorBody().string();
+                                                    Log.e(TAG, errorMessage);
+                                                } catch (IOException er) {
+                                                    er.printStackTrace();
+                                                }
+                                            } else if (throwable instanceof IOException) {
+                                                Log.e(TAG, "Can not connect to qiscus server.");
+                                            } else {
+                                                Log.e(TAG, "Unexpected error.");
                                             }
-                                        } else if (throwable instanceof IOException) {
-                                            Log.e(TAG, "Can not connect to qiscus server.");
-                                        } else {
-                                            Log.e(TAG, "Unexpected error.");
                                         }
-                                    }
-                                });
-                    }
-                });
-                dialog.findViewById(R.id.login_user5).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Qiscus.setUser("user5_sample_call@example.com", "123")
-                                .withUsername("User 5 Sample Call")
-                                .save(new Qiscus.SetUserListener() {
-                                    @Override
-                                    public void onSuccess(QiscusAccount qiscusAccount) {
-                                        Log.i(TAG, "Login chat with account: " + qiscusAccount);
-                                        alertDialog.cancel();
+                                    });
+                        }
+                    });
+                    dialog.findViewById(R.id.login_user4).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Qiscus.setUser("user4_sample_call@example.com", "123")
+                                    .withUsername("User 4 Sample Call")
+                                    .save(new Qiscus.SetUserListener() {
+                                        @Override
+                                        public void onSuccess(QiscusAccount qiscusAccount) {
+                                            Log.i(TAG, "Login chat with account: " + qiscusAccount);
+                                            alertDialog.cancel();
 
-                                        startActivity(new Intent(MainActivity.this, ContactActivity.class));
-                                    }
+                                            startActivity(new Intent(MainActivity.this, ContactActivity.class));
+                                        }
 
-                                    @Override
-                                    public void onError(Throwable throwable) {
-                                        if (throwable instanceof HttpException) {
-                                            HttpException e = (HttpException) throwable;
+                                        @Override
+                                        public void onError(Throwable throwable) {
+                                            if (throwable instanceof HttpException) {
+                                                HttpException e = (HttpException) throwable;
 
-                                            try {
-                                                String errorMessage = e.response().errorBody().string();
-                                                Log.e(TAG, errorMessage);
-                                            } catch (IOException er) {
-                                                er.printStackTrace();
+                                                try {
+                                                    String errorMessage = e.response().errorBody().string();
+                                                    Log.e(TAG, errorMessage);
+                                                } catch (IOException er) {
+                                                    er.printStackTrace();
+                                                }
+                                            } else if (throwable instanceof IOException) {
+                                                Log.e(TAG, "Can not connect to qiscus server.");
+                                            } else {
+                                                Log.e(TAG, "Unexpected error.");
                                             }
-                                        } else if (throwable instanceof IOException) {
-                                            Log.e(TAG, "Can not connect to qiscus server.");
-                                        } else {
-                                            Log.e(TAG, "Unexpected error.");
                                         }
-                                    }
-                                });
-                    }
-                });
+                                    });
+                        }
+                    });
+                    dialog.findViewById(R.id.login_user5).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Qiscus.setUser("user5_sample_call@example.com", "123")
+                                    .withUsername("User 5 Sample Call")
+                                    .save(new Qiscus.SetUserListener() {
+                                        @Override
+                                        public void onSuccess(QiscusAccount qiscusAccount) {
+                                            Log.i(TAG, "Login chat with account: " + qiscusAccount);
+                                            alertDialog.cancel();
+
+                                            startActivity(new Intent(MainActivity.this, ContactActivity.class));
+                                        }
+
+                                        @Override
+                                        public void onError(Throwable throwable) {
+                                            if (throwable instanceof HttpException) {
+                                                HttpException e = (HttpException) throwable;
+
+                                                try {
+                                                    String errorMessage = e.response().errorBody().string();
+                                                    Log.e(TAG, errorMessage);
+                                                } catch (IOException er) {
+                                                    er.printStackTrace();
+                                                }
+                                            } else if (throwable instanceof IOException) {
+                                                Log.e(TAG, "Can not connect to qiscus server.");
+                                            } else {
+                                                Log.e(TAG, "Unexpected error.");
+                                            }
+                                        }
+                                    });
+                        }
+                    });
+                }
             }
         });
     }
