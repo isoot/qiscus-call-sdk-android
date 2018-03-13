@@ -44,8 +44,8 @@
         <activity
             android:name=".integration.ChatActivity"
             android:label="@string/title_activity_chat"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".integration.ContactActivity"></activity>
+            android:theme="@style/ToolbarActionMode" />
+        <activity android:name=".integration.ContactActivity"/>
     </application>
 
 </manifest>
