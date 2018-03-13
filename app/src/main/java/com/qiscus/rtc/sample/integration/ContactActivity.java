@@ -69,26 +69,6 @@ public class ContactActivity extends AppCompatActivity implements HomePresenter.
     }
 
     @Override
-    public void showGroupChatRoomPage(QiscusChatRoom chatRoom) {
-
-    }
-
-    @Override
-    public void showContactPage() {
-
-    }
-
-    @Override
-    public void showSelectContactPage() {
-
-    }
-
-    @Override
-    public void showLoginPage() {
-
-    }
-
-    @Override
     public void showErrorMessage(String errorMessage) {
         Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show();
     }

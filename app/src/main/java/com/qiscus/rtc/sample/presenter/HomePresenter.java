@@ -25,37 +25,13 @@ public class HomePresenter {
     }
 
     public void openChatRoom(QiscusChatRoom chatRoom) {
-        if (chatRoom.isGroup()) {
-            view.showGroupChatRoomPage(chatRoom);
-            return;
-        }
         view.showChatRoomPage(chatRoom);
-    }
-
-    public void createChatRoom() {
-        view.showContactPage();
-    }
-
-    public void createGroupChatRoom() {
-        view.showSelectContactPage();
-    }
-
-    public void logout() {
-        view.showLoginPage();
     }
 
     public interface View {
         void showChatRooms(List<QiscusChatRoom> chatRooms);
 
         void showChatRoomPage(QiscusChatRoom chatRoom);
-
-        void showGroupChatRoomPage(QiscusChatRoom chatRoom);
-
-        void showContactPage();
-
-        void showSelectContactPage();
-
-        void showLoginPage();
 
         void showErrorMessage(String errorMessage);
     }
