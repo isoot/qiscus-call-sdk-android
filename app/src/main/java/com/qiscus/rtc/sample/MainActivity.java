@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.qiscus.rtc.sample.integration.ChatActivity;
 import com.qiscus.rtc.sample.integration.ContactActivity;
@@ -24,15 +25,25 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
     private Button simple;
     private Button integration;
+    private Button logout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        simple = (Button) findViewById(R.id.btn_simple);
-        integration = (Button) findViewById(R.id.btn_chat_integration);
+        simple = findViewById(R.id.btn_simple);
+        integration = findViewById(R.id.btn_chat_integration);
+        logout = findViewById(R.id.btn_logout);
 
+        logout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                logout.setVisibility(View.GONE);
+                Toast.makeText(getApplicationContext(), "Success Logout", Toast.LENGTH_SHORT).show();
+                Qiscus.clearUser();
+            }
+        });
         simple.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -196,6 +207,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
+        Log.d(TAG, "onResumeChat: " + Qiscus.hasSetupUser());
+        if (Qiscus.hasSetupUser()) {
+            logout.setVisibility(View.VISIBLE);
+            logout.setText("Logout as "+Qiscus.getQiscusAccount().getUsername());
+        } else {
+            logout.setVisibility(View.GONE);
+        }
     }
 
     @Override
