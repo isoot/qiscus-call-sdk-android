@@ -1,0 +1,14 @@
+package data;
+
+import com.qiscus.rtc.sample.utils.Action;
+import com.qiscus.sdk.data.model.QiscusChatRoom;
+
+import java.util.List;
+
+/**
+ * Created by rajapulau on 3/13/18.
+ */
+
+public interface ChatRoomRepository {
+    void getChatRooms(Action<List<QiscusChatRoom>> onSuccess, Action<Throwable> onError);
+}

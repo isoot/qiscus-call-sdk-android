@@ -22,9 +22,15 @@ import org.json.JSONObject;
  */
 
 public class SampleApplication extends Application {
+
+    private static SampleApplication instance;
+    private AppComponent component;
+
     @Override
     public void onCreate() {
         super.onCreate();
+        instance = this;
+        component = new AppComponent(this);
         Qiscus.init(this, Config.CHAT_APP_ID);
         QiscusRTC.init(this, Config.CALL_APP_ID, Config.CALL_APP_SECRET);
         Qiscus.getChatConfig().setNotificationBuilderInterceptor(new QiscusNotificationBuilderInterceptor() {
@@ -40,6 +46,14 @@ public class SampleApplication extends Application {
         if (!EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().register(this);
         }
+    }
+
+    public static SampleApplication getInstance() {
+        return instance;
+    }
+
+    public AppComponent getComponent() {
+        return component;
     }
 
     @Subscribe
