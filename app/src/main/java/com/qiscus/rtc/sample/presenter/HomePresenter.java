@@ -1,10 +1,14 @@
 package com.qiscus.rtc.sample.presenter;
 
+import android.util.Log;
+
+import com.qiscus.rtc.sample.utils.Action;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 
 import java.util.List;
 
 import data.ChatRoomRepository;
+import data.UserRepository;
 
 /**
  * Created by rajapulau on 3/13/18.
@@ -13,10 +17,12 @@ import data.ChatRoomRepository;
 public class HomePresenter {
     private View view;
     private ChatRoomRepository chatRoomRepository;
+    private UserRepository userRepository;
 
-    public HomePresenter(View view, ChatRoomRepository chatRoomRepository) {
+    public HomePresenter(View view, ChatRoomRepository chatRoomRepository, UserRepository userRepository) {
         this.view = view;
         this.chatRoomRepository = chatRoomRepository;
+        this.userRepository = userRepository;
     }
 
     public void loadChatRooms() {
@@ -32,6 +38,11 @@ public class HomePresenter {
         view.showChatRoomPage(chatRoom);
     }
 
+    public void logout() {
+        userRepository.logout();
+        view.showMainPage();
+    }
+
     public interface View {
         void showChatRooms(List<QiscusChatRoom> chatRooms);
 
@@ -40,5 +51,7 @@ public class HomePresenter {
         void showContactPage();
 
         void showErrorMessage(String errorMessage);
+
+        void showMainPage();
     }
 }

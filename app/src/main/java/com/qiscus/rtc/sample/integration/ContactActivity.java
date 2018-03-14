@@ -16,6 +16,7 @@ import android.widget.AdapterView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.qiscus.rtc.sample.MainActivity;
 import com.qiscus.rtc.sample.R;
 import com.qiscus.rtc.sample.SampleApplication;
 import com.qiscus.rtc.sample.adapter.ChatRoomAdapter;
@@ -51,7 +52,8 @@ public class ContactActivity extends AppCompatActivity implements HomePresenter.
         recyclerView.setAdapter(chatRoomAdapter);
 
         homePresenter = new HomePresenter(this,
-                SampleApplication.getInstance().getComponent().getChatRoomRepository());
+                SampleApplication.getInstance().getComponent().getChatRoomRepository(),
+                SampleApplication.getInstance().getComponent().getUserRepository());
 
     }
 
@@ -73,12 +75,12 @@ public class ContactActivity extends AppCompatActivity implements HomePresenter.
         if (item.getItemId() == R.id.new_chat) {
             homePresenter.createChatRoom();
         } else if (item.getItemId() == R.id.logout) {
-//            new AlertDialog.Builder(this)
-//                    .setTitle("Logout")
-//                    .setMessage("Are you sure wants to logout?")
-//                    .setPositiveButton("Logout", (dialog, which) -> homePresenter.logout())
-//                    .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
-//                    .show();
+            new AlertDialog.Builder(this)
+                    .setTitle("Logout")
+                    .setMessage("Are you sure wants to logout?")
+                    .setPositiveButton("Logout", (dialog, which) -> homePresenter.logout())
+                    .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
+                    .show();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -106,5 +108,10 @@ public class ContactActivity extends AppCompatActivity implements HomePresenter.
     @Override
     public void showErrorMessage(String errorMessage) {
         Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showMainPage() {
+        startActivity(new Intent(this, MainActivity.class));
     }
 }
