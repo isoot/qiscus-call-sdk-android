@@ -157,6 +157,9 @@ QiscusRTC.Call.getCallConfig()
 
 That's it! You just need 3 steps to build voice call in your apps.
 
-### Example
+### Try your call
+You can try call to Android apps and Web App. Default user in our Web RTC is User3. You just click our example Web RTC Example below.
 
+### Example
+- [Web RTC Example](https://rtc.qiscus.com/chat-integration/)
 - [Basic example](https://github.com/qiscus/qiscus-rtc-sdk-android/blob/master/app/src/main/java/com/qiscus/rtc/sample/MainActivity.java)
