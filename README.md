@@ -164,3 +164,5 @@ You can try call to Android apps and Web App. Default user in our Web RTC is Use
 - [Basic example](https://github.com/qiscus/qiscus-rtc-sdk-android/blob/master/app/src/main/java/com/qiscus/rtc/sample/MainActivity.java)
 - [Web Call Example](https://rtc.qiscus.com/chat-integration/)
 
+### Proguard
+If you want to use proguard, please read [this](app/proguard-rules.pro) file and you can add 
