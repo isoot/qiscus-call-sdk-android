@@ -70,6 +70,7 @@ public class QiscusCallActivity extends BaseActivity implements CallingFragment.
         Intent intent = new Intent(context, QiscusCallActivity.class);
         intent.putExtra(CALL_DATA, callData);
 
+
         return intent;
     }
 
@@ -359,7 +360,6 @@ public class QiscusCallActivity extends BaseActivity implements CallingFragment.
             QiscusRTC.Call.getCallConfig().getOnEndCallClickListener().onClick(callData, calldurationMillis);
         }
 
-        callEventData.setCallEvent(QiscusRTC.CallEvent.END);
         EventBus.getDefault().post(callEventData);
         rtcClient.endCall();
         disconnect();
@@ -455,6 +455,7 @@ public class QiscusCallActivity extends BaseActivity implements CallingFragment.
 
     private void disconnect() {
         NotificationManagerCompat.from(this).cancel(ON_GOING_NOTIF_ID);
+        callEventData.setCallEvent(QiscusRTC.CallEvent.END);
         releaseProximity();
 
         if (rtcClient != null) {
