@@ -3,6 +3,7 @@ package com.qiscus.rtc.util;
 import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.os.Handler;
 import android.os.Vibrator;
 import android.util.Log;
 
@@ -16,6 +17,7 @@ public class RingManager {
     private static RingManager ringManager;
     private AudioManager audioManager;
     private MediaPlayer phoneRingPlayer;
+    private MediaPlayer phoneHangupPlayer;
     private Context context;
     private Vibrator v;
 
@@ -86,6 +88,37 @@ public class RingManager {
                 case AudioManager.RINGER_MODE_VIBRATE:
                     vibrate();
             }
+        }
+    }
+
+    public synchronized void playHangup(QiscusRTC.CallType callType) {
+        phoneHangupPlayer = MediaPlayer.create(context, QiscusRTC.Call.getCallConfig().getHangupSound());
+        phoneHangupPlayer.setLooping(false);
+
+        if (phoneHangupPlayer != null && !phoneHangupPlayer.isPlaying()) {
+            audioManager.setMode(AudioManager.MODE_IN_CALL);
+            audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC,
+                    AudioManager.ADJUST_RAISE, 0);
+            try {
+                phoneHangupPlayer.start();
+            } catch (Throwable t) {
+                Log.e("RingtoneManager", "Failed to start playing hangup tone");
+            }
+
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if (phoneHangupPlayer != null) {
+                        if (phoneHangupPlayer.isPlaying()) {
+                            phoneHangupPlayer.stop();
+                            phoneHangupPlayer.release();
+                            phoneHangupPlayer = null;
+                        }
+                    }
+                }
+            }, 1000);
+
         }
     }
 

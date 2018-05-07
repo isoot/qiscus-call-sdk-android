@@ -24,7 +24,6 @@ import de.tavendo.autobahn.WebSocketException;
 
 public class WebSocketChannel {
     private static final String TAG = WebSocketChannel.class.getSimpleName();
-    private static String SERVER = "wss://rtc.qiscus.com/signal";
 
     private final WebSocketChannelEvents events;
     private final Handler handler;
@@ -86,13 +85,13 @@ public class WebSocketChannel {
 
         closeEvent = false;
 
-        Log.d(TAG, "Connecting WebSocket to: " + SERVER );
+        Log.d(TAG, "Connecting WebSocket to: " + QiscusRTC.getHost() );
 
         ws = new WebSocketConnection();
         wsObserver = new WebSocketObserver();
 
         try {
-            ws.connect(new URI(SERVER), wsObserver);
+            ws.connect(new URI(QiscusRTC.getHost()), wsObserver);
         } catch (URISyntaxException e) {
             reportError("URI error: " + e.getMessage());
         } catch (WebSocketException e) {
@@ -139,7 +138,7 @@ public class WebSocketChannel {
     public void createRoom(String roomId, String token) {
         checkIfCalledOnValidThread();
 
-        if (state != WebSocketConnectionState.CONNECTED) {
+        if (state != WebSocketConnectionState.REGISTERED) {
             Log.e(TAG, "WebSocket create room in state " + state);
             return;
         }
@@ -166,7 +165,7 @@ public class WebSocketChannel {
     public void joinRoom(String roomId, String token) {
         checkIfCalledOnValidThread();
 
-        if (state != WebSocketConnectionState.CONNECTED) {
+        if (state != WebSocketConnectionState.REGISTERED) {
             Log.e(TAG, "WebSocket join room in state " + state);
             return;
         }
@@ -545,17 +544,12 @@ public class WebSocketChannel {
     private class WebSocketObserver implements WebSocket.WebSocketConnectionObserver {
         @Override
         public void onOpen() {
-            Log.d(TAG, "WebSocket connection opened to: " + SERVER);
+            Log.d(TAG, "WebSocket connection opened to: " + QiscusRTC.getHost());
             handler.post(new Runnable() {
                 @Override
                 public void run() {
                     state = WebSocketConnectionState.CONNECTED;
                     events.onWebSocketOpen();
-
-                    // Check if we have pending register request.
-                    if (client_id != null) {
-                        register(client_id);
-                    }
                 }
             });
         }

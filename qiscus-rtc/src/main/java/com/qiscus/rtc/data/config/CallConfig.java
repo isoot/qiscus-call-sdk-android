@@ -19,6 +19,7 @@ public class CallConfig {
     //ui ux configuration
     private int waitingSound = R.raw.phone_waiting;
     private int ringingSound = R.raw.phone_ring;
+    private int hangupSound = R.raw.phone_hangup;
     private int backgroundDrawable = R.drawable.bg_call;
     private int backgroundColor;
     private int backgroundImage;
@@ -241,6 +242,16 @@ public class CallConfig {
     @RawRes
     public int getRingingSound() {
         return ringingSound;
+    }
+
+    /**
+     * get hangup sound
+     *
+     * @return - hangup sound raw id
+     */
+    @RawRes
+    public int getHangupSound() {
+        return hangupSound;
     }
 
     /**

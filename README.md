@@ -25,7 +25,7 @@ allprojects {
 
 ```groovy
 dependencies {
-  compile 'com.github.qiscus:qiscus-rtc-sdk-android:0.6'
+  compile 'com.github.qiscus:qiscus-rtc-sdk-android:0.10'
 }
 ```
 
@@ -59,6 +59,8 @@ Init Qiscus at your application
 
 Parameters:
 * context: context
+* app_id: String
+* app_secret: String
 
 ```java
 public class SampleApplication extends Application {
@@ -70,6 +72,26 @@ public class SampleApplication extends Application {
 }
 ```
 To get your `app_id` and `app_secret`, please [contact us](https://www.qiscus.com/contactus).
+
+### Init with custom host
+
+Qiscus also provides on-premise package, so you can host signaling server on your own network. Please [contact us](https://www.qiscus.com/contactus) to get further information.
+
+Parameters:
+* context: context
+* app_id: String
+* app_secret: String
+* host: String
+
+```java
+public class SampleApplication extends Application {
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        QiscusRTC.init(this, app_id, app_secret, host);
+    }
+}
+```
 
 ## Method
 
@@ -135,6 +157,12 @@ QiscusRTC.Call.getCallConfig()
 
 That's it! You just need 3 steps to build voice call in your apps.
 
-### Example
+### Try your call
+You can try call to Android apps and Web App. Default user in our Web RTC is User3. You just click our example Web RTC Example below.
 
+### Example
 - [Basic example](https://github.com/qiscus/qiscus-rtc-sdk-android/blob/master/app/src/main/java/com/qiscus/rtc/sample/MainActivity.java)
+- [Web Call Example](https://rtc.qiscus.com/chat-integration/)
+
+### Proguard
+If you want to use proguard, please read [this](app/proguard-rules.pro) file and you can add 

@@ -43,6 +43,7 @@ public class QiscusRTC {
     private static ScheduledThreadPoolExecutor taskExecutor;
     private static String appId;
     private static String appSecret;
+    private static String appHost;
 
     private QiscusRTC() {
         //
@@ -227,6 +228,8 @@ public class QiscusRTC {
      * Call this method from your Application class.
      *
      * @param instance - Application instance
+     * @param app_id - String app_id
+     * @param app_secret - String app_secret
      */
     public static void init(Application instance, String app_id, String app_secret) {
         appInstance = instance;
@@ -236,6 +239,27 @@ public class QiscusRTC {
         session = new QiscusRTCSession(applicationContext);
         appId = app_id;
         appSecret = app_secret;
+        appHost = "wss://rtc.qiscus.com/signal";
+    }
+
+    /**
+     * The first method you need to be invoke to using qiscusrtc sdk.
+     * Call this method from your Application class.
+     *
+     * @param instance - Application instance
+     * @param app_id - String app_id
+     * @param app_secret - String app_secret
+     * @param host - String host
+     */
+    public static void init(Application instance, String app_id, String app_secret, String host) {
+        appInstance = instance;
+        applicationContext = appInstance.getApplicationContext();
+        applicationHandler = new Handler(applicationContext.getMainLooper());
+        taskExecutor = new ScheduledThreadPoolExecutor(5);
+        session = new QiscusRTCSession(applicationContext);
+        appId = app_id;
+        appSecret = app_secret;
+        appHost = host;
     }
 
     /**
@@ -279,6 +303,15 @@ public class QiscusRTC {
      */
     public static String getAppSecret() {
         return appSecret;
+    }
+
+    /**
+     * Use this method to get signaling host
+     *
+     * @return String appHost
+     */
+    public static String getHost() {
+        return appHost;
     }
 
     /**
