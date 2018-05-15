@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import com.qiscus.rtc.sample.integration.ContactActivity;
 import com.qiscus.rtc.sample.presenter.LoginPresenter;
+import com.qiscus.rtc.sample.routing.RoutingActivity;
 import com.qiscus.rtc.sample.simple.LoginActivity;
 import com.qiscus.sdk.Qiscus;
 
@@ -19,6 +20,7 @@ public class MainActivity extends AppCompatActivity implements LoginPresenter.Vi
     private static final String TAG = MainActivity.class.getSimpleName();
     private Button simple;
     private Button integration;
+    private Button routing;
     private Button logout;
 
     private AlertDialog alertDialog;
@@ -30,9 +32,10 @@ public class MainActivity extends AppCompatActivity implements LoginPresenter.Vi
 
         simple = findViewById(R.id.btn_simple);
         integration = findViewById(R.id.btn_chat_integration);
+        routing = findViewById(R.id.btn_queue_routing);
         logout = findViewById(R.id.btn_logout);
 
-        LoginPresenter loginPresenter = new LoginPresenter(this,
+        final LoginPresenter loginPresenter = new LoginPresenter(this,
                 SampleApplication.getInstance().getComponent().getUserRepository());
         loginPresenter.start();
 
@@ -44,6 +47,7 @@ public class MainActivity extends AppCompatActivity implements LoginPresenter.Vi
                 Qiscus.clearUser();
             }
         });
+
         simple.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -109,6 +113,14 @@ public class MainActivity extends AppCompatActivity implements LoginPresenter.Vi
                         }
                     });
                 }
+            }
+        });
+
+        routing.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, RoutingActivity.class);
+                startActivity(intent);
             }
         });
     }

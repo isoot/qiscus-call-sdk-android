@@ -492,6 +492,7 @@ public class QiscusRTC {
     }
 
     public enum CallEvent {
+        CALLING,
         REJECT,
         CANCEL,
         END,

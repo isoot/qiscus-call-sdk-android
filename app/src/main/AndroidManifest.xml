@@ -46,7 +46,8 @@
             android:label="@string/title_activity_chat"
             android:theme="@style/ToolbarActionMode" />
         <activity android:name=".integration.ContactActivity" />
-        <activity android:name=".integration.ListContactActivity"></activity>
+        <activity android:name=".integration.ListContactActivity" />
+        <activity android:name=".routing.RoutingActivity"></activity>
     </application>
 
 </manifest>
