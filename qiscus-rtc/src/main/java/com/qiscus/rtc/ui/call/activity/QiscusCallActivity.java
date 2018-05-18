@@ -91,6 +91,8 @@ public class QiscusCallActivity extends BaseActivity implements CallingFragment.
             }
 
             callEventData = new QiscusRTC.CallEventData();
+
+            QiscusRTC.Call.getInstance().setRtcListener(this);
         } else {
             finish();
         }
@@ -135,6 +137,7 @@ public class QiscusCallActivity extends BaseActivity implements CallingFragment.
     protected void onDestroy() {
         Thread.setDefaultUncaughtExceptionHandler(null);
         NotificationManagerCompat.from(this).cancel(ON_GOING_NOTIF_ID);
+        QiscusRTC.Call.getInstance().setRtcListener(null);
         disconnect();
         super.onDestroy();
     }

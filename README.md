@@ -18,14 +18,14 @@ Add to your project build.gradle
 ```groovy
 allprojects {
   repositories {
-    maven { url 'https://jitpack.io' }
+    maven { url "https://artifactory.qiscus.com/artifactory/qiscus-library-open-source" }
   }
 }
 ```
 
 ```groovy
 dependencies {
-  compile 'com.github.qiscus:qiscus-rtc-sdk-android:0.10'
+  implementation 'com.qiscus.sdk:call-rtc:1.0.0'
 }
 ```
 
