@@ -12,6 +12,7 @@ import com.qiscus.rtc.data.local.LocalDataManager;
 import com.qiscus.rtc.data.model.QiscusRTCAccount;
 import com.qiscus.rtc.data.model.QiscusRTCCall;
 import com.qiscus.rtc.data.model.QiscusRTCSession;
+import com.qiscus.rtc.engine.util.QiscusRTCListener;
 import com.qiscus.rtc.ui.call.activity.QiscusCallActivity;
 
 import org.json.JSONException;
@@ -365,6 +366,7 @@ public class QiscusRTC {
         private CallType callType = CallType.VOICE;
         private boolean accepted = false;
         private boolean connected = false;
+        private QiscusRTCListener rtcListener;
 
         /**
          * Get QiscusRTC call instance.
@@ -472,6 +474,24 @@ public class QiscusRTC {
             }
 
             return callConfig;
+        }
+
+        /**
+         * Set call listener
+         *
+         * @param rtcListener call activity
+         */
+        public void setRtcListener(QiscusRTCListener rtcListener) {
+            this.rtcListener = rtcListener;
+        }
+
+        /**
+         * End current call
+         */
+        public void endCall() {
+            if (rtcListener != null) {
+                rtcListener.onCallEnded();
+            }
         }
     }
 
