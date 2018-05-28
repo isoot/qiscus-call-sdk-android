@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import com.qiscus.rtc.QiscusRTC;
 import com.qiscus.rtc.sample.R;
+import com.qiscus.rtc.sample.utils.Config;
 import com.qiscus.rtc.sample.utils.RouterConnection;
 
 import org.json.JSONException;
@@ -43,6 +44,7 @@ public class RoutingActivity extends AppCompatActivity {
 
         JSONObject request = new JSONObject();
         try {
+            request.put("appId", Config.CALL_APP_ID);
             request.put("callerId", callerId);
             request.put("callerName", callerName);
         } catch (JSONException e) {
