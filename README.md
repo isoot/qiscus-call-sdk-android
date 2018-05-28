@@ -18,14 +18,14 @@ Add to your project build.gradle
 ```groovy
 allprojects {
   repositories {
-    maven { url 'https://jitpack.io' }
+    maven { url "https://artifactory.qiscus.com/artifactory/qiscus-library-open-source" }
   }
 }
 ```
 
 ```groovy
 dependencies {
-  compile 'com.github.qiscus:qiscus-rtc-sdk-android:0.10'
+  implementation 'com.qiscus.sdk:call-rtc:1.1.0'
 }
 ```
 
@@ -164,3 +164,5 @@ You can try call to Android apps and Web App. Default user in our Web RTC is Use
 - [Basic example](https://github.com/qiscus/qiscus-rtc-sdk-android/blob/master/app/src/main/java/com/qiscus/rtc/sample/MainActivity.java)
 - [Web Call Example](https://rtc.qiscus.com/chat-integration/)
 
+### Proguard
+If you want to use proguard, please read [this](app/proguard-rules.pro) file and you can add 
