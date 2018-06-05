@@ -235,6 +235,16 @@ public class CallConfig {
     }
 
     /**
+     * set hangup sound
+     *
+     * @param hangupSound - hangup sound raw id
+     */
+    public CallConfig setHangupSound(@RawRes int hangupSound) {
+        this.hangupSound = hangupSound;
+        return this;
+    }
+
+    /**
      * get ringing sound
      *
      * @return - ringing sound raw id
