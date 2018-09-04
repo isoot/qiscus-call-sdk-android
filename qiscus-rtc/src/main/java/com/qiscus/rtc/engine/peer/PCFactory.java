@@ -1,7 +1,6 @@
 package com.qiscus.rtc.engine.peer;
 
 import android.content.Context;
-import android.os.Handler;
 import android.util.Log;
 
 import org.webrtc.AudioSource;
@@ -54,25 +53,28 @@ public class PCFactory {
     }
 
     private void create(Context context) {
-        PeerConnectionFactory.initializeInternalTracer();
-
         Log.d(TAG, "Create peer connection factory. Use video: " + videoEnabled);
 
         String fieldTrials = "";
         fieldTrials += VIDEO_VP8_INTEL_HW_ENCODER_FIELDTRIAL;
-        //Log.d(TAG, "Enable FlexFEC field trial");
-        //fieldTrials += VIDEO_FLEXFEC_FIELDTRIAL;
-        //Log.d(TAG, "Disable WebRTC AGC field trial");
-        //fieldTrials += DISABLE_WEBRTC_AGC_FIELDTRIAL;
+        Log.d(TAG, "Enable FlexFEC field trial");
+        fieldTrials += VIDEO_FLEXFEC_FIELDTRIAL;
+        Log.d(TAG, "Disable WebRTC AGC field trial");
+        fieldTrials += DISABLE_WEBRTC_AGC_FIELDTRIAL;
+
+        PeerConnectionFactory.initialize(
+                PeerConnectionFactory.InitializationOptions.builder(context)
+                        .setFieldTrials(fieldTrials)
+                        .setEnableInternalTracer(true)
+                        .createInitializationOptions());
 
         Log.d(TAG, "Preferred video codec: " + preferredVideoCodec);
-        PeerConnectionFactory.initializeFieldTrials(fieldTrials);
         Log.d(TAG, "Field trials: " + fieldTrials);
 
         WebRtcAudioManager.setBlacklistDeviceForOpenSLESUsage(false);
-        WebRtcAudioUtils.setWebRtcBasedAcousticEchoCanceler(false);
-        WebRtcAudioUtils.setWebRtcBasedAutomaticGainControl(false);
-        WebRtcAudioUtils.setWebRtcBasedNoiseSuppressor(false);
+        WebRtcAudioUtils.setWebRtcBasedAcousticEchoCanceler(true);
+        WebRtcAudioUtils.setWebRtcBasedAutomaticGainControl(true);
+        WebRtcAudioUtils.setWebRtcBasedNoiseSuppressor(true);
 
         WebRtcAudioRecord.setErrorCallback(new WebRtcAudioRecord.WebRtcAudioRecordErrorCallback() {
             @Override
@@ -107,8 +109,6 @@ public class PCFactory {
                 Log.e(TAG, "WebRtcAudioTrackError: " + errorMessage);
             }
         });
-
-        PeerConnectionFactory.initializeAndroidGlobals(context, true);
 
         if (options != null) {
             Log.d(TAG, "Factory networkIgnoreMask option: " + options.networkIgnoreMask);
