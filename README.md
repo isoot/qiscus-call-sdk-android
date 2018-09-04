@@ -25,7 +25,7 @@ allprojects {
 
 ```groovy
 dependencies {
-  implementation 'com.qiscus.sdk:call-rtc:1.1.0'
+  implementation 'com.qiscus.sdk:call-rtc:1.2.0'
 }
 ```
 
